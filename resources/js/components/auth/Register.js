@@ -2,14 +2,26 @@ import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import { userService } from '../../services/auth';
+import { hasError, processServerErrors } from '../../helpers';
+import Username from './fields/Username';
+import Email from './fields/Email';
+import Password from './fields/Password';
+import ConfirmPassword from './fields/ConfirmPassword';
+import ServerErrors from './fields/ServerErrors';
 
 function Register(props) {
-    const [error, setError] = useState({});
-    const [message, setMessage] = useState(null);
+    const [errors, setErrors] = useState({});
+    const [serverErrors, setServerErrors] = useState(null);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
+    const [touched, setTouched] = useState({
+        name: false,
+        email: false,
+        password: false,
+        passwordConfirmation: false,
+    });
 
     const onChangeName = e => {
         setName(e.target.value);
@@ -27,17 +39,47 @@ function Register(props) {
         setPasswordConfirmation(e.target.value);
     };
 
+    const updateError = (key, value) => {
+        setErrors({...errors, [key]: value});
+    };
+
+    const touchField = field => {
+        setTouched({ ...touched, [field]: true });
+    };
+
+    const checkPasswords = () => {
+        let result = true;
+        if (!errors.password && !errors.passwordConfirmation && touched.password && touched.passwordConfirmation) {
+            result = password === passwordConfirmation;
+            if (!result) {
+                updateError('passwordConfirmation', 'Password and password confirmation do not match');
+            }
+        }
+
+        return result;
+    };
+
+    const isFormValid =
+        !!(name && email && password && passwordConfirmation
+            && !hasError(errors))
+            && checkPasswords();
+
     const registerHandle = e => {
         e.preventDefault();
+        setServerErrors(null);
 
-        userService.register({
-            name,
-            email,
-            password,
-            password_confirmation: passwordConfirmation,
-        }).then(response => {
-            props.history.push('/login');
-        });
+        if (isFormValid) {
+            userService.register({
+                name,
+                email,
+                password,
+                password_confirmation: passwordConfirmation,
+            }).then(response => {
+                props.history.push('/login');
+            }).catch(err => {
+                setServerErrors(processServerErrors(err.response.data.errors || [err.response.data.error]));
+            });
+        }
     };
 
     return (
@@ -48,105 +90,54 @@ function Register(props) {
                         <div className="card-header">Register</div>
                         <div className="card-body">
                             <form method="POST">
-                                <div className="form-group row">
-                                    <label htmlFor="name" className="col-md-4 col-form-label text-md-right">Name</label>
+                                <Email
+                                    value={email}
+                                    errors={errors}
+                                    changeHandler={onChangeEmail}
+                                    setErrors={updateError}
+                                    touched={touched.email}
+                                    handleTouch={touchField}
+                                />
+                                <Username
+                                    value={name}
+                                    errors={errors}
+                                    changeHandler={onChangeName}
+                                    setErrors={updateError}
+                                    touched={touched.name}
+                                    handleTouch={touchField}
+                                />
+                                <Password
+                                    value={password}
+                                    errors={errors}
+                                    changeHandler={onChangePassword}
+                                    setErrors={updateError}
+                                    touched={touched.password}
+                                    handleTouch={touchField}
+                                />
 
-                                    <div className="col-md-6">
-                                        <input
-                                            id="name"
-                                            type="text"
-                                            className={`form-control ${error.name ? 'is-invalid' : '' }`}
-                                            name="name"
-                                            value={name}
-                                            onChange={onChangeName}
-                                            required
-                                            autoComplete="name"
-                                            autoFocus
-                                        />
-
-                                        {error.name && (
-                                            <span className="invalid-feedback" role="alert">
-                                                <strong>{message}</strong>
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="form-group row">
-                                    <label htmlFor="email" className="col-md-4 col-form-label text-md-right">E-Mail Address</label>
-
-                                    <div className="col-md-6">
-                                        <input
-                                            id="email"
-                                            type="email"
-                                            className={`form-control ${error.email ? 'is-invalid' : '' }`}
-                                            name="email"
-                                            value={email}
-                                            onChange={onChangeEmail}
-                                            required
-                                            autoComplete="email"
-                                        />
-
-                                        {error.email && (
-                                            <span className="invalid-feedback" role="alert">
-                                                <strong>{message}</strong>
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="form-group row">
-                                    <label htmlFor="password" className="col-md-4 col-form-label text-md-right">Password</label>
-
-                                    <div className="col-md-6">
-                                        <input
-                                            id="password"
-                                            type="password"
-                                            name="password"
-                                            className={`form-control ${error.password ? 'is-invalid' : '' }`}
-                                            value={password}
-                                            onChange={onChangePassword}
-                                            required autoComplete="new-password"
-                                        />
-
-                                        {error.password && (
-                                            <span className="invalid-feedback" role="alert">
-                                                <strong>{message}</strong>
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="form-group row">
-                                    <label htmlFor="password-confirm"
-                                           className="col-md-4 col-form-label text-md-right">
-                                        Confirm Password
-                                    </label>
-
-                                    <div className="col-md-6">
-                                        <input
-                                            id="password-confirm"
-                                            type="password"
-                                            className="form-control"
-                                            name="password_confirmation"
-                                            value={passwordConfirmation}
-                                            onChange={onChangePasswordConfirmation}
-                                            required
-                                            autoComplete="new-password"
-                                        />
-                                    </div>
-                                </div>
+                                <ConfirmPassword
+                                    value={passwordConfirmation}
+                                    errors={errors}
+                                    changeHandler={onChangePasswordConfirmation}
+                                    setErrors={updateError}
+                                    touched={touched.passwordConfirmation}
+                                    handleTouch={touchField}
+                                />
 
                                 <div className="form-group row mb-0">
                                     <div className="col-md-6 offset-md-4">
                                         <button
                                             className="btn btn-primary"
                                             onClick={registerHandle}
+                                            disabled={!isFormValid}
                                         >
                                             Register
                                         </button>
                                     </div>
                                 </div>
+                                <ServerErrors
+                                    serverErrors={serverErrors}
+                                />
                             </form>
                         </div>
                     </div>
