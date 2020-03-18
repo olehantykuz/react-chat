@@ -40,7 +40,6 @@ function Email(props) {
                     onChange={handleChange}
                     required
                     autoComplete="email"
-                    autoFocus
                     onBlur={handleBlur}
                 />
 
