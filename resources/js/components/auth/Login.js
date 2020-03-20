@@ -1,21 +1,28 @@
-import React, { useState } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import {clearRegisterStatus, clearServerErrors, login} from '../../actions/auth';
 
-import { userService } from '../../services/auth';
-import { hasError, processServerErrors } from '../../helpers';
+import { hasError } from '../../helpers';
 import Email from './fields/Email';
 import Password from './fields/Password';
 import ServerErrors from './fields/ServerErrors';
 
 function Login(props) {
     const [errors, setErrors] = useState({});
-    const [serverErrors, setServerErrors] = useState(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [touched, setTouched] = useState({
         email: false,
         password: false,
     });
+
+    useEffect(() => {
+        return function () {
+            props.clearServerErrors('login');
+            props.clearRegisterStatus();
+        }
+    }, []);
 
     const onChangeEmail = e => {
         setEmail(e.target.value);
@@ -37,16 +44,10 @@ function Login(props) {
 
     const loginHandle = e => {
         e.preventDefault();
-        setServerErrors(null);
-
         if (isFormValid) {
-            userService.login({
+            props.login({
                 email,
                 password,
-            }).then(response => {
-                props.history.push('/');
-            }).catch(err => {
-                setServerErrors(processServerErrors(err.response.data.errors || [err.response.data.error]));
             });
         }
     };
@@ -59,6 +60,11 @@ function Login(props) {
                         <div className="card-header">Login</div>
 
                         <div className="card-body">
+                            {props.auth.registerStatus && (
+                                <div className="alert alert-success mb-2" role="alert">
+                                    <strong>Registration completed successfully</strong>
+                                </div>
+                            )}
                             <form method="POST">
                                 <Email
                                     value={email}
@@ -92,7 +98,7 @@ function Login(props) {
                                     </div>
                                 </div>
                                 <ServerErrors
-                                    serverErrors={serverErrors}
+                                    serverErrors={props.auth.errors.login}
                                 />
                             </form>
                         </div>
@@ -103,4 +109,16 @@ function Login(props) {
     );
 }
 
-export default withRouter(Login);
+const mapStateToProps = state => ({
+    auth: state.auth
+});
+
+const mapDispatchToProps = dispatch => ({
+    login: data => dispatch(login(data)),
+    clearRegisterStatus: () => dispatch(clearRegisterStatus()),
+    clearServerErrors: field => dispatch(clearServerErrors(field)),
+});
+
+export default withRouter(
+    connect(mapStateToProps, mapDispatchToProps)(Login)
+);

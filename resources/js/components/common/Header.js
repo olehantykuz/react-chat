@@ -1,16 +1,14 @@
 import React, { Fragment } from 'react';
 import { Link, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import { isLoggedIn } from '../../helpers';
-import { userService } from '../../services/auth';
+import { logoutUser } from '../../actions/auth';
 
 function Header(props) {
     const logoutHandle = e => {
         e.preventDefault();
-
-        userService.logout().then(response => {
-            props.history.push('/');
-        })
+        props.logout();
     };
 
 
@@ -45,7 +43,7 @@ function Header(props) {
                             <li className="nav-item dropdown">
                                 <a id="navbarDropdown" className="nav-link dropdown-toggle" href="#" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Username <span className="caret"></span>
+                                    {props.user.name || 'username'} <span className="caret"></span>
                                 </a>
 
                                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -63,4 +61,13 @@ function Header(props) {
     );
 }
 
-export default withRouter(Header);
+const mapStateToProps = state => ({
+    user: state.user
+});
+const mapDispatchToProps = dispatch => ({
+    logout: () => dispatch(logoutUser())
+});
+
+export default withRouter(
+    connect(mapStateToProps, mapDispatchToProps)(Header)
+);
