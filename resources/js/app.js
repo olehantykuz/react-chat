@@ -3,10 +3,12 @@ require('./bootstrap');
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {
-    BrowserRouter as Router,
+    Router,
     Switch,
     Route
 } from "react-router-dom";
+import { createBrowserHistory } from 'history';
+
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
@@ -19,11 +21,12 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
 const store = createStore(reducer, composeWithDevTools(applyMiddleware(thunk)));
+export const history = createBrowserHistory();
 
 function App() {
     return (
         <Provider store={store}>
-            <Router>
+            <Router history={history}>
                 <Switch>
                     <Route path="/login">
                         <LoginPage />
