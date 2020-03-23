@@ -9,6 +9,7 @@ use App\Services\MessageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Events\MessageSent;
 
 class ChatsController extends ApiController
 {
@@ -50,6 +51,7 @@ class ChatsController extends ApiController
         $message = $this->messageService->create(
             $user, $request->input('text')
         );
+        broadcast(new MessageSent($message))->toOthers();
 
         return response()->json(['message' => $message]);
     }
