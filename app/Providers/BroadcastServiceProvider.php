@@ -17,7 +17,7 @@ class BroadcastServiceProvider extends ServiceProvider
     public function boot()
     {
         Route::post('broadcasting/auth', function () {
-            $url = request()->hasHeader('Authorization') ? '/api' : '/web';
+            $url = request()->hasHeader('Authorization') ? '/api' : '';
 
             $proxy = Request::create($url . '/broadcasting/auth', 'POST', request()->toArray());
             $proxy->headers = request()->headers;
