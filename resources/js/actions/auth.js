@@ -1,7 +1,7 @@
 import { userService } from '../services/auth';
 import { setUserData, clearUserData } from './user';
 import { processServerErrors } from '../helpers';
-import { history } from '../app';
+import { history } from '../history';
 
 const requestLogin = () => ({
     type: 'REQUEST_LOGIN'
