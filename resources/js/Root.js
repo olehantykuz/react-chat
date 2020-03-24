@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 
 import { history } from './history';
 import { fetchUser } from './actions/user';
+import { fetchConfig } from './actions/config';
 import { isLoggedIn } from './helpers';
 
 import MainPage from './pages/MainPage';
@@ -16,6 +17,9 @@ import RegisterPage from './pages/RegisterPage';
 
 function Root(props) {
     useEffect(() => {
+        if (Object.keys(props.config).length === 0) {
+            props.fetchConfig();
+        }
         if (isLoggedIn()) {
             props.fetchUser();
         }
@@ -39,10 +43,12 @@ function Root(props) {
 }
 
 const mapStateToProps = state => ({
-    user: state.user
+    user: state.user,
+    config: state.config,
 });
 const mapDispatchToProps = dispatch => ({
     fetchUser: () => dispatch(fetchUser()),
+    fetchConfig: () => dispatch(fetchConfig()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Root);
