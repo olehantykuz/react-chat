@@ -4,13 +4,14 @@ import { connect } from 'react-redux';
 
 import { isLoggedIn } from '../../helpers';
 import { logoutUser } from '../../actions/auth';
+import { clearMessages } from '../../actions/chat';
 
 function Header(props) {
     const logoutHandle = e => {
         e.preventDefault();
         props.logout();
+        props.clearMessages();
     };
-
 
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-white shadow-sm mb-4">
@@ -43,7 +44,7 @@ function Header(props) {
                             <li className="nav-item dropdown">
                                 <a id="navbarDropdown" className="nav-link dropdown-toggle" href="#" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {props.user.name || 'username'} <span className="caret"></span>
+                                    {props.user.profile.name || 'username'} <span className="caret"></span>
                                 </a>
 
                                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -65,7 +66,8 @@ const mapStateToProps = state => ({
     user: state.user
 });
 const mapDispatchToProps = dispatch => ({
-    logout: () => dispatch(logoutUser())
+    logout: () => dispatch(logoutUser()),
+    clearMessages: () => dispatch(clearMessages())
 });
 
 export default withRouter(
