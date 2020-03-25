@@ -7,15 +7,29 @@ import { isLoggedIn } from '../../helpers';
 
 function ChatMessages (props) {
     useEffect(() => {
-        Echo.private('chat')
-            .listen('.message.send', e => {
-                const { message } = e;
-                props.addMessage(message);
-            });
+        const hasConfigs = props.config.broadcastChannelPrefix !== undefined;
+        const channelName = props.config.broadcastChannelPrefix + 'private-chat';
+        if (hasConfigs) {
+            Echo.channel(channelName)
+                .listen('.message.send', e => {
+                    const { message } = e;
+
+                    //TODO: Fix self listening for redis driver
+                    if (message.user.id !== props.user.profile.id) {
+                        props.addMessage(message);
+                    }
+                });
+        }
+
         if (isLoggedIn()) {
             props.fetchMessages();
         }
-    }, []);
+
+        return () => {
+            hasConfigs && Echo.leave(channelName);
+        }
+
+    }, [props.config, props.user.profile]);
 
     return (
         <ul className="chat">
@@ -33,6 +47,8 @@ function ChatMessages (props) {
 
 const mapStateToProps = state => ({
     chat: state.chat,
+    user: state.user,
+    config: state.config,
 });
 const mapDispatchToProps = dispatch => ({
     fetchMessages: () => dispatch(fetchMessages()),

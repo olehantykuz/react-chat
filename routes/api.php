@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['namespace' => 'App'], function () {
+    Route::group(['middleware' => 'api'], function () {
+        Route::get('config', 'ConfigController');
+    });
     Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
         Route::post('register', 'AuthController@register');
         Route::post('login', 'AuthController@login');
