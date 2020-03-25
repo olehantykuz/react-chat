@@ -10,10 +10,22 @@ function ChatMessagesForm(props) {
         setMessage(e.target.value);
     };
 
+    const sendMessage = () => {
+        if (message.trim()) {
+            props.sendMessage(message);
+            setMessage('');
+        }
+    };
+
     const handleOnClick = e => {
         e.preventDefault();
-        props.sendMessage(message);
-        setMessage('');
+        sendMessage();
+    };
+
+    const handleKeyPress = e => {
+        if(e.key === 'Enter'){
+            sendMessage();
+        }
     };
 
     return (
@@ -25,6 +37,7 @@ function ChatMessagesForm(props) {
                 className="form-control input-sm"
                 placeholder="Type your message here..."
                 onChange={handleOnChange}
+                onKeyPress={handleKeyPress}
                 value={message}
             />
 
