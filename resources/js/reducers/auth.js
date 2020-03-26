@@ -1,3 +1,17 @@
+import {
+    REQUEST_LOGIN,
+    LOGIN_SUCCESS,
+    LOGIN_FAILURE,
+    CLEAR_LOGIN_STATUS,
+    LOGOUT,
+    REQUEST_REGISTER,
+    REGISTER_SUCCESS,
+    REGISTER_FAILURE,
+    CLEAR_REGISTER_STATUS,
+    SET_SERVER_ERRORS,
+    CLEAR_SERVER_ERRORS
+} from '../actionTypes/auth'
+
 const initialState = {
     errors: {
         login: [],
@@ -12,10 +26,10 @@ const initialState = {
 
 const auth = (state=initialState, action) => {
     switch (action.type) {
-        case 'REQUEST_LOGIN': {
+        case REQUEST_LOGIN: {
             return {...state, isRequestLogin: true}
         }
-        case 'LOGIN_SUCCESS': {
+        case LOGIN_SUCCESS: {
             return {
                 ...state,
                 isRequestLogin: false,
@@ -23,7 +37,7 @@ const auth = (state=initialState, action) => {
                 loginStatus: true
             }
         }
-        case 'LOGIN_FAILURE': {
+        case LOGIN_FAILURE: {
             return {
                 ...state,
                 isRequestLogin: false,
@@ -31,33 +45,33 @@ const auth = (state=initialState, action) => {
                 loginStatus: false
             }
         }
-        case 'CLEAR_LOGIN_STATUS': {
+        case CLEAR_LOGIN_STATUS: {
             return {...state, loginStatus: null}
         }
-        case 'LOGOUT': {
+        case LOGOUT: {
             return initialState;
         }
-        case 'REQUEST_REGISTER': {
+        case REQUEST_REGISTER: {
             return {...state, isRequestRegister: true}
         }
-        case 'REGISTER_SUCCESS': {
+        case REGISTER_SUCCESS: {
             return {
                 ...state,
                 isRequestRegister: false,
                 registerStatus: true
             }
         }
-        case 'REGISTER_FAILURE': {
+        case REGISTER_FAILURE: {
             return {
                 ...state,
                 isRequestRegister: false,
                 registerStatus: false
             }
         }
-        case 'CLEAR_REGISTER_STATUS': {
+        case CLEAR_REGISTER_STATUS: {
             return {...state, registerStatus: null}
         }
-        case 'SET_SERVER_ERRORS': {
+        case SET_SERVER_ERRORS: {
             const { field, value } = action;
             const errors = Object.assign({}, {
                 ...state.errors,
@@ -66,7 +80,7 @@ const auth = (state=initialState, action) => {
 
             return {...state, errors }
         }
-        case 'CLEAR_SERVER_ERRORS': {
+        case CLEAR_SERVER_ERRORS: {
             const { field } = action;
             const errors = Object.assign({}, {
                 ...state.errors,

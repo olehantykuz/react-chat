@@ -3,43 +3,57 @@ import { setUserData, clearUserData } from './user';
 import { processServerErrors } from '../helpers';
 import { history } from '../history';
 
+import {
+    REQUEST_LOGIN,
+    LOGIN_SUCCESS,
+    LOGIN_FAILURE,
+    CLEAR_LOGIN_STATUS,
+    LOGOUT,
+    REQUEST_REGISTER,
+    REGISTER_SUCCESS,
+    REGISTER_FAILURE,
+    CLEAR_REGISTER_STATUS,
+    SET_SERVER_ERRORS,
+    CLEAR_SERVER_ERRORS
+} from '../actionTypes/auth'
+
 const requestLogin = () => ({
-    type: 'REQUEST_LOGIN'
+    type: REQUEST_LOGIN
 });
 const loggedIn = () => ({
-    type: 'LOGIN_SUCCESS'
+    type: LOGIN_SUCCESS
 });
 const loginFailure = () => ({
-    type: 'LOGIN_FAILURE'
+    type: LOGIN_FAILURE
 });
 export const clearLoginStatus = () => ({
-    type: 'CLEAR_LOGIN_STATUS'
+    type: CLEAR_LOGIN_STATUS
 });
 
 const requestRegister = () => ({
-    type: 'REQUEST_REGISTER'
+    type: REQUEST_REGISTER
 });
 const registerSuccess = () => ({
-    type: 'REGISTER_SUCCESS'
+    type: REGISTER_SUCCESS
 });
 const registerFailure = () => ({
-    type: 'REGISTER_FAILURE'
+    type: REGISTER_FAILURE
 });
 export const clearRegisterStatus = () => ({
-    type: 'CLEAR_REGISTER_STATUS'
+    type: CLEAR_REGISTER_STATUS
 });
 
 const setServerErrors = (field, value) => ({
-    type: 'SET_SERVER_ERRORS',
+    type: SET_SERVER_ERRORS,
     field,
     value
 });
 export const clearServerErrors = field => ({
-    type: 'CLEAR_SERVER_ERRORS',
+    type: CLEAR_SERVER_ERRORS,
     field
 });
 export const logout = () => ({
-    type: 'LOGOUT',
+    type: LOGOUT,
 });
 
 export const login = data => {
