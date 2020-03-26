@@ -1,7 +1,11 @@
+import { normalize } from 'normalizr';
+import { userSchema } from '../schemas';
+
 import { userService } from '../services/auth';
-import { setUserData, clearUserData } from './user';
+import { clearUsers } from './users';
 import { processServerErrors } from '../helpers';
 import { history } from '../history';
+import { setUser } from './users';
 
 import {
     REQUEST_LOGIN,
@@ -14,7 +18,11 @@ import {
     REGISTER_FAILURE,
     CLEAR_REGISTER_STATUS,
     SET_SERVER_ERRORS,
-    CLEAR_SERVER_ERRORS
+    CLEAR_SERVER_ERRORS,
+
+    FETCHING_AUTH_USER,
+    FETCHING_AUTH_USER_SUCCESS,
+    FETCHING_AUTH_USER_FAILURE,
 } from '../actionTypes/auth'
 
 const requestLogin = () => ({
@@ -56,13 +64,24 @@ export const logout = () => ({
     type: LOGOUT,
 });
 
+const fetchingAuthUser = () => ({
+    type: FETCHING_AUTH_USER
+});
+const fetchingAuthUserSuccess = id => ({
+    type: FETCHING_AUTH_USER_SUCCESS,
+    id
+});
+const fetchingAuthUserFailure = () => ({
+    type: FETCHING_AUTH_USER_FAILURE
+});
+
 export const login = data => {
     return dispatch => {
         dispatch(clearServerErrors('login'));
         dispatch(requestLogin());
         userService.login(data).then(response => {
             dispatch(loggedIn());
-            dispatch(setUserData(response.data.user));
+            dispatch(fetchUser());
             dispatch(clearLoginStatus());
             history.push('/');
         }, error => {
@@ -91,9 +110,25 @@ export const register = data => {
 export const logoutUser = () => {
     return dispatch => {
         userService.logout().then(() => {
-            dispatch(clearUserData());
+            dispatch(clearUsers());
             dispatch(logout());
             history.push('/')
         });
+    }
+};
+
+export const fetchUser = () => {
+    return dispatch => {
+        dispatch(fetchingAuthUser());
+        userService.getProfile().then(response => {
+            const normalizedResponse = normalize(response.data.user, userSchema);
+            const id = normalizedResponse.result;
+            const user = normalizedResponse.entities.users[id];
+            dispatch(setUser(id, user));
+            dispatch(fetchingAuthUserSuccess(id));
+        },error => {
+            console.log({error});
+            dispatch(fetchingAuthUserFailure());
+        })
     }
 };

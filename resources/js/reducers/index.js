@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux';
 
-import user from './user';
 import auth from './auth';
 import chat from './chat';
 import config from './config';
+import users from './users';
 
 export default combineReducers({
     config,
-    user,
+    users,
     auth,
     chat,
 });

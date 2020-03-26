@@ -21,7 +21,7 @@ function ChatMessages (props) {
                 });
         }
 
-        if (isLoggedIn()) {
+        if (isLoggedIn() && props.chat.messages.length === 0 && !props.chat.fetchingMessage) {
             props.fetchMessages();
         }
 
@@ -29,7 +29,7 @@ function ChatMessages (props) {
             hasConfigs && Echo.leave(channelName);
         }
 
-    }, [props.config, props.user.profile]);
+    }, [props.config, props.auth.id]);
 
     return (
         <ul className="chat">
@@ -47,7 +47,7 @@ function ChatMessages (props) {
 
 const mapStateToProps = state => ({
     chat: state.chat,
-    user: state.user,
+    auth: state.auth,
     config: state.config,
 });
 const mapDispatchToProps = dispatch => ({

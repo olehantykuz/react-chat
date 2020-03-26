@@ -9,10 +9,14 @@ import {
     REGISTER_FAILURE,
     CLEAR_REGISTER_STATUS,
     SET_SERVER_ERRORS,
-    CLEAR_SERVER_ERRORS
+    CLEAR_SERVER_ERRORS,
+    FETCHING_AUTH_USER,
+    FETCHING_AUTH_USER_SUCCESS,
+    FETCHING_AUTH_USER_FAILURE,
 } from '../actionTypes/auth'
 
 const initialState = {
+    id: null,
     errors: {
         login: [],
         register: [],
@@ -22,6 +26,8 @@ const initialState = {
     isRequestLogin: false,
     loggedIn: false,
     loginStatus: null,
+    fetchingAuthUser: false,
+    fetchingAuthUserStatus: null
 };
 
 const auth = (state=initialState, action) => {
@@ -34,7 +40,7 @@ const auth = (state=initialState, action) => {
                 ...state,
                 isRequestLogin: false,
                 loggedIn: true,
-                loginStatus: true
+                loginStatus: true,
             }
         }
         case LOGIN_FAILURE: {
@@ -42,7 +48,8 @@ const auth = (state=initialState, action) => {
                 ...state,
                 isRequestLogin: false,
                 loggedIn: false,
-                loginStatus: false
+                loginStatus: false,
+                id: null
             }
         }
         case CLEAR_LOGIN_STATUS: {
@@ -89,6 +96,16 @@ const auth = (state=initialState, action) => {
 
             return {...state, errors }
         }
+        case FETCHING_AUTH_USER: {
+            return {...state, fetchingAuthUser: true, id: action.id};
+        }
+        case FETCHING_AUTH_USER_SUCCESS: {
+            return {...state, fetchingAuthUser: false, fetchingAuthUserStatus: true, id: action.id};
+        }
+        case FETCHING_AUTH_USER_FAILURE: {
+            return {...state, fetchingAuthUser: false, fetchingAuthUserStatus: false, id: null};
+        }
+
         default:
             return state;
     }

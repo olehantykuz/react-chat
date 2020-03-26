@@ -13,6 +13,11 @@ function Header(props) {
         props.clearMessages();
     };
 
+    const authId = props.auth.id;
+    const userName = (authId && props.users[authId] !== undefined)
+        ? props.users[authId].name
+        : 'username';
+
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-white shadow-sm mb-4">
             <div className="container">
@@ -44,7 +49,7 @@ function Header(props) {
                             <li className="nav-item dropdown">
                                 <a id="navbarDropdown" className="nav-link dropdown-toggle" href="#" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {props.user.profile.name || 'username'} <span className="caret"></span>
+                                    {userName} <span className="caret"></span>
                                 </a>
 
                                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -63,7 +68,8 @@ function Header(props) {
 }
 
 const mapStateToProps = state => ({
-    user: state.user
+    users: state.users,
+    auth: state.auth
 });
 const mapDispatchToProps = dispatch => ({
     logout: () => dispatch(logoutUser()),
