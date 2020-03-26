@@ -6,7 +6,7 @@ export default function ChatMessageItem(props) {
             <div className="chat-body clearfix">
                 <div className="header">
                     <strong className="primary-font">
-                        {props.message.user.name}
+                        {props.user.name}
                     </strong>
                 </div>
                 <p>

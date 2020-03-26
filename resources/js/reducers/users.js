@@ -1,4 +1,4 @@
-import {CLEAR_USERS, REMOVE_USER, SET_USER} from '../actionTypes/users';
+import {CLEAR_USERS, REMOVE_USER, SET_USER, ADD_USERS} from '../actionTypes/users';
 
 const users = (state = {}, action) => {
     switch (action.type) {
@@ -6,6 +6,18 @@ const users = (state = {}, action) => {
             const { id, data } = action;
 
             return {...state, [id]: data}
+        }
+        case ADD_USERS: {
+            const { items } = action;
+            const entities = {...state};
+
+            Object.keys(items).forEach(id => {
+                if (!entities.hasOwnProperty(id)) {
+                    entities[id] = {...items[id]};
+                }
+            });
+
+            return entities;
         }
         case REMOVE_USER: {
             return Object.keys(state)

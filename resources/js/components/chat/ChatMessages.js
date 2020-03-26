@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
 import ChatMessagesItem from './ChatMessagesItem';
-import { addMessage, fetchMessages } from '../../actions/chat';
+import { addNewChatMessage, fetchMessages } from '../../actions/chat';
 import { isLoggedIn } from '../../helpers';
 
 function ChatMessages (props) {
@@ -15,8 +15,8 @@ function ChatMessages (props) {
                     const { message } = e;
 
                     //TODO: Fix self listening for redis driver
-                    if (message.user.id !== props.user.profile.id) {
-                        props.addMessage(message);
+                    if (message.user.id !== props.auth.id) {
+                        props.addNewChatMessage(message);
                     }
                 });
         }
@@ -33,11 +33,15 @@ function ChatMessages (props) {
 
     return (
         <ul className="chat">
-            {props.chat.messages.map(message => {
+            {props.chat.messages.map(id => {
+                const message = props.messages[id];
+                const user = props.users[message.user];
+
                 return (
                     <ChatMessagesItem
                         message={message}
-                        key={message.id}
+                        user={user}
+                        key={id}
                     />
                 );
             })}
@@ -47,12 +51,14 @@ function ChatMessages (props) {
 
 const mapStateToProps = state => ({
     chat: state.chat,
+    users: state.users,
+    messages: state.messages,
     auth: state.auth,
     config: state.config,
 });
 const mapDispatchToProps = dispatch => ({
     fetchMessages: () => dispatch(fetchMessages()),
-    addMessage: payload => dispatch(addMessage(payload))
+    addNewChatMessage: payload => dispatch(addNewChatMessage(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatMessages);

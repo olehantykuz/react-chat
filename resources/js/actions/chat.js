@@ -1,73 +1,92 @@
+import { normalize } from 'normalizr';
+import { messageSchema } from '../schemas';
+
 import { chatService } from '../services/chat';
 import {
-    SET_MESSAGES,
-    FETCHING_MESSAGES,
-    FETCHING_MESSAGES_SUCCESS,
-    FETCHING_MESSAGES_FAILURE,
-    SENDING_MESSAGE,
-    SENDING_MESSAGE_SUCCESS,
-    SENDING_MESSAGE_FAILURE,
-    ADD_MESSAGE,
-    CLEAR_MESSAGES,
+    SET_CHAT_MESSAGES,
+    FETCHING_CHAT_MESSAGES,
+    FETCHING_CHAT_MESSAGES_SUCCESS,
+    FETCHING_CHAT_MESSAGES_FAILURE,
+    SENDING_CHAT_MESSAGE,
+    SENDING_CHAT_MESSAGE_SUCCESS,
+    SENDING_CHAT_MESSAGE_FAILURE,
+    ADD_CHAT_MESSAGE,
+    CLEAR_CHAT_MESSAGES,
 } from '../actionTypes/chat';
+import { addUsers } from './users';
+import {addMessages, setMessage} from './messages';
 
-const setMessages = messages => ({
-    type: SET_MESSAGES,
+const setChatMessages = messages => ({
+    type: SET_CHAT_MESSAGES,
     messages
 });
-const fetchingMessages = () => ({
-    type: FETCHING_MESSAGES
+const fetchingChatMessages = () => ({
+    type: FETCHING_CHAT_MESSAGES
 });
-const fetchingMessagesSuccess = () => ({
-    type: FETCHING_MESSAGES_SUCCESS
+const fetchingChatMessagesSuccess = () => ({
+    type: FETCHING_CHAT_MESSAGES_SUCCESS
 });
-const fetchingMessagesFailure = () => ({
-    type: FETCHING_MESSAGES_FAILURE
-});
-
-export const addMessage = message => ({
-    type: ADD_MESSAGE,
-    message
-});
-const sendingMessage = () => ({
-    type: SENDING_MESSAGE,
-});
-const sendingMessageSuccess = () => ({
-    type: SENDING_MESSAGE_SUCCESS,
-});
-const sendingMessageFailure = () => ({
-    type: SENDING_MESSAGE_FAILURE,
+const fetchingChatMessagesFailure = () => ({
+    type: FETCHING_CHAT_MESSAGES_FAILURE
 });
 
-export const clearMessages = () => ({
-    type: CLEAR_MESSAGES
+export const addChatMessage = id => ({
+    type: ADD_CHAT_MESSAGE,
+    id
+});
+const sendingChatMessage = () => ({
+    type: SENDING_CHAT_MESSAGE,
+});
+const sendingChatMessageSuccess = () => ({
+    type: SENDING_CHAT_MESSAGE_SUCCESS,
+});
+const sendingChatMessageFailure = () => ({
+    type: SENDING_CHAT_MESSAGE_FAILURE,
+});
+
+export const clearChatMessages = () => ({
+    type: CLEAR_CHAT_MESSAGES
 });
 
 export const sendMessage = message => {
     return dispatch => {
-        dispatch(sendingMessage());
+        dispatch(sendingChatMessage());
         chatService.sendMessage(message).then(
             response => {
-                dispatch(addMessage(response.data.message));
-                dispatch(sendingMessageSuccess());
+                const normalizedMessage = normalize(response.data.message, messageSchema);
+                dispatch(addMessages(normalizedMessage.entities.messages));
+                dispatch(addChatMessage(normalizedMessage.result));
+                dispatch(sendingChatMessageSuccess());
             },
             error => {
-                dispatch(sendingMessageFailure());
+                dispatch(sendingChatMessageFailure());
             }
         )
     }
 };
 
+export const addNewChatMessage = message => {
+    return dispatch => {
+        const normalizedMessage = normalize(message, messageSchema);
+        dispatch(addUsers(normalizedMessage.entities.users));
+        dispatch(addMessages(normalizedMessage.entities.messages));
+        dispatch(addChatMessage(message.id));
+    }
+};
+
 export const fetchMessages = () => {
     return dispatch => {
-        dispatch(fetchingMessages());
+        dispatch(fetchingChatMessages());
         chatService.fetchMessages().then(
             response => {
-                dispatch(setMessages(response.data.messages));
-                dispatch(fetchingMessagesSuccess());
+                const normalizedMessages = normalize(response.data.messages, [messageSchema]);
+                dispatch(addUsers(normalizedMessages.entities.users));
+                dispatch(addMessages(normalizedMessages.entities.messages));
+                dispatch(setChatMessages(normalizedMessages.result));
+                dispatch(fetchingChatMessagesSuccess());
             },
             error => {
-                dispatch(fetchingMessagesFailure());
+                dispatch(fetchingChatMessagesFailure());
             }
         )
     }

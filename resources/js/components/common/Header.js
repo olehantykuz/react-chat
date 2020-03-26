@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { isLoggedIn } from '../../helpers';
 import { logoutUser } from '../../actions/auth';
-import { clearMessages } from '../../actions/chat';
+import { clearChatMessages } from '../../actions/chat';
 
 function Header(props) {
     const logoutHandle = e => {
@@ -73,7 +73,7 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = dispatch => ({
     logout: () => dispatch(logoutUser()),
-    clearMessages: () => dispatch(clearMessages())
+    clearMessages: () => dispatch(clearChatMessages())
 });
 
 export default withRouter(
