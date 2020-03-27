@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { hasError, processServerErrors } from '../../helpers';
+import { hasError } from '../../helpers';
 import Username from './fields/Username';
 import Email from './fields/Email';
 import Password from './fields/Password';
