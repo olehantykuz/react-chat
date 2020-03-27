@@ -16,6 +16,6 @@ export const removeMessage = id => ({
     id
 });
 
-export const clearMessage = () => ({
+export const clearMessages = () => ({
     type: CLEAR_MESSAGES
 });

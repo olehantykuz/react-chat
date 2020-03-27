@@ -2,7 +2,6 @@ import { normalize } from 'normalizr';
 import { userSchema } from '../schemas';
 
 import { userService } from '../services/auth';
-import { clearUsers } from './users';
 import { processServerErrors } from '../helpers';
 import { history } from '../history';
 import { setUser } from './users';
@@ -12,7 +11,6 @@ import {
     LOGIN_SUCCESS,
     LOGIN_FAILURE,
     CLEAR_LOGIN_STATUS,
-    LOGOUT,
     REQUEST_REGISTER,
     REGISTER_SUCCESS,
     REGISTER_FAILURE,
@@ -60,9 +58,6 @@ export const clearServerErrors = field => ({
     type: CLEAR_SERVER_ERRORS,
     field
 });
-export const logout = () => ({
-    type: LOGOUT,
-});
 
 const fetchingAuthUser = () => ({
     type: FETCHING_AUTH_USER
@@ -104,16 +99,6 @@ export const register = data => {
             const err = processServerErrors(error.response.data.errors || [error.response.data.error]);
             dispatch(setServerErrors('register', err));
         })
-    }
-};
-
-export const logoutUser = () => {
-    return dispatch => {
-        userService.logout().then(() => {
-            dispatch(clearUsers());
-            dispatch(logout());
-            history.push('/')
-        });
     }
 };
 

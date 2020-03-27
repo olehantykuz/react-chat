@@ -3,14 +3,13 @@ import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { isLoggedIn } from '../../helpers';
-import { logoutUser } from '../../actions/auth';
+import { logoutUser } from '../../actions/logout';
 import { clearChatMessages } from '../../actions/chat';
 
 function Header(props) {
     const logoutHandle = e => {
         e.preventDefault();
         props.logout();
-        props.clearMessages();
     };
 
     const authId = props.auth.id;
