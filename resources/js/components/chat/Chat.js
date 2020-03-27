@@ -1,6 +1,7 @@
 import React from 'react';
 import ChatMessages from './ChatMessages';
 import ChatMessagesForm from './ChatMessagesForm';
+import SearchNewContacts from './SearchNewContacts';
 
 function Chat(props) {
     return (
@@ -24,7 +25,7 @@ function Chat(props) {
             <div className="col-md-3">
                 <div className="card w-100">
                     <div className="card-body">
-                        <h5>Search</h5>
+                        <SearchNewContacts />
                     </div>
                 </div>
                 <div className="card w-100">

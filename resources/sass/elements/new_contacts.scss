@@ -1,0 +1,15 @@
+.new_contacts {
+    &--item {
+        border-bottom: 1px solid grey;
+        padding: 5px;
+        margin-bottom: 0.5em;
+
+        button {
+            padding: 0 7px;
+        }
+
+        span {
+            padding-left: 5px;
+        }
+    }
+}
