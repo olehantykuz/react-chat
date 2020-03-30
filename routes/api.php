@@ -33,6 +33,8 @@ Route::group(['namespace' => 'App'], function () {
         });
         Route::group(['prefix' => 'contacts'], function () {
             Route::get('search/new', 'ContactController@searchNewContacts');
+            Route::post('{user}/friends/add', 'ContactController@addToFriend');
+            Route::put('{user}/friends/confirm', 'ContactController@confirmFriend');
         });
     });
 });
