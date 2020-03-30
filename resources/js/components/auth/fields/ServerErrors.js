@@ -1,4 +1,5 @@
 import React, {Fragment} from 'react';
+import PropTypes from 'prop-types'
 
 function ServerErrors(props) {
     return (
@@ -20,3 +21,7 @@ function ServerErrors(props) {
 }
 
 export default ServerErrors;
+
+ServerErrors.propTypes = {
+    serverErrors: PropTypes.arrayOf(PropTypes.string)
+};

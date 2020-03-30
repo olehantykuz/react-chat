@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function ChatMessageItem(props) {
     return (
@@ -16,3 +17,8 @@ export default function ChatMessageItem(props) {
         </li>
     );
 }
+
+ChatMessageItem.propTypes = {
+    user: PropTypes.object.isRequired,
+    message: PropTypes.object.isRequired
+};
