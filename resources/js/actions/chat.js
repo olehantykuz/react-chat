@@ -14,7 +14,7 @@ import {
     CLEAR_CHAT_MESSAGES,
 } from '../actionTypes/chat';
 import { addUsers } from './users';
-import {addMessages, setMessage} from './messages';
+import { addMessages } from './messages';
 
 const setChatMessages = messages => ({
     type: SET_CHAT_MESSAGES,
@@ -80,9 +80,11 @@ export const fetchMessages = () => {
         chatService.fetchMessages().then(
             response => {
                 const normalizedMessages = normalize(response.data.messages, [messageSchema]);
-                dispatch(addUsers(normalizedMessages.entities.users));
-                dispatch(addMessages(normalizedMessages.entities.messages));
-                dispatch(setChatMessages(normalizedMessages.result));
+                if (normalizedMessages.result.length > 0) {
+                    dispatch(addUsers(normalizedMessages.entities.users));
+                    dispatch(addMessages(normalizedMessages.entities.messages));
+                    dispatch(setChatMessages(normalizedMessages.result));
+                }
                 dispatch(fetchingChatMessagesSuccess());
             },
             error => {
