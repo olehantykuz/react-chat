@@ -1,5 +1,8 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+
 import { contactsService } from '../../services/contacts';
+import { sendFriendRequest } from '../../actions/contacts';
 
 function SearchNewContacts(props) {
     const [query, setQuery] = useState('');
@@ -27,6 +30,10 @@ function SearchNewContacts(props) {
         setQuery(e.target.value);
     };
 
+    const handleClick = (id) => {
+        props.sendFriendRequest(id);
+    };
+
     return (
         <Fragment>
             <h5 className="text-center">Find user</h5>
@@ -46,7 +53,10 @@ function SearchNewContacts(props) {
                     contacts.map(contact => {
                         return (
                             <div key={contact.id} className="new_contacts--item">
-                                <button className="btn btn-outline-success">+</button>
+                                <button
+                                    className="btn btn-outline-success"
+                                    onClick={() => {handleClick(contact.id)}}
+                                >+</button>
                                 <span>{contact.name} ({contact.email})</span>
                             </div>
                         );
@@ -57,4 +67,12 @@ function SearchNewContacts(props) {
     );
 }
 
-export default SearchNewContacts;
+const mapStateToProps = state => ({
+    auth: state.auth,
+    config: state.config
+});
+const mapDispatchToProps = dispatch => ({
+    sendFriendRequest: id => dispatch(sendFriendRequest(id))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchNewContacts);
