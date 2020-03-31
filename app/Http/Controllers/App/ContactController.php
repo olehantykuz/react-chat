@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Events\FriendRequest;
 use App\Http\Controllers\ApiController;
 use App\Models\User;
 use App\Services\UserService;
@@ -56,10 +57,13 @@ class ContactController extends ApiController
         $sender = Auth::user();
 
         $result = $this->userService->requestToFriend($sender, $user);
+        if ($result) {
+            broadcast(new FriendRequest($sender, $user))->toOthers();
 
-        return $result
-            ? response()->json(['contact' => 'Contact already exists'], 400)
-            : response()->json(['id' => $result['attached'][0]], 200);
+            return response()->json(['recipient' => new UserResource($user)], 200);
+        }
+
+        return response()->json(['contact' => 'Contact already exists'], 400);
     }
 
     /**
