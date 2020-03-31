@@ -11,7 +11,16 @@ const findNew = query => {
     }).then(response => response);
 };
 
+const requestToFriend = id => {
+    return axios({
+        url: `${baseUrl}/${id}/friends/add`,
+        method: 'post',
+        headers: authHeader(),
+    }).then(response => response);
+};
+
 export const contactsService = {
-    findNew
+    findNew,
+    requestToFriend
 };
 
