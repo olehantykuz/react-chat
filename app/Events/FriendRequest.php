@@ -11,6 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use App\Http\Resources\User as UserResource;
 
 class FriendRequest implements ShouldBroadcast
 {
@@ -27,7 +28,7 @@ class FriendRequest implements ShouldBroadcast
      */
     public function __construct(User $sender, User $recipient)
     {
-        $this->sender = $sender;
+        $this->sender = $sender->withoutRelations();
         $this->recipient = $recipient;
     }
 

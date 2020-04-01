@@ -113,7 +113,7 @@ class User extends Authenticatable implements JWTSubject
     public function friendsOfMine()
     {
         return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')
-            ->wherePivot('accepted_at', '!=', null) // to filter only accepted
+            ->wherePivot('accepted_at', '!=', null)
             ->withPivot('accepted_at')
             ->withTimestamps();
     }
@@ -124,7 +124,7 @@ class User extends Authenticatable implements JWTSubject
     public function friendsOf()
     {
         return $this->belongsToMany(self::class, 'friends', 'friend_id', 'user_id')
-            ->wherePivot('accepted_at', '!=', null) // to filter only accepted
+            ->wherePivot('accepted_at', '!=', null)
             ->withPivot('accepted_at')
             ->withTimestamps();
     }
@@ -134,18 +134,11 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getFriendsAttribute()
     {
-        if ( !array_key_exists('friends', $this->relations)) {
-            $this->loadFriends();
+        if ( !$this->relationLoaded('friends')) {
+            $this->setRelation('friends', $this->mergeFriends());
         }
 
         return $this->getRelation('friends');
-    }
-
-    protected function loadFriends()
-    {
-        if ( !array_key_exists('friends', $this->relations)) {
-            $this->setRelation('friends', $this->mergeFriends());
-        }
     }
 
     /**

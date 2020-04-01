@@ -80,4 +80,16 @@ class UserService
 
         return null;
     }
+
+    /**
+     * @param User $user
+     * @return User
+     */
+    public function loadFriendRelations(User $user)
+    {
+        $user->load(['requestedFriendsTo', 'requestFriendsBy']);
+        $user->friends;
+
+        return $user;
+    }
 }
