@@ -115,3 +115,34 @@ export const addFriendRequest = sender => {
         dispatch(addContactToRequests(id));
     }
 };
+
+export const confirmFriendRequest = id => {
+    return dispatch => {
+        dispatch(confirmingNewFriend());
+        dispatch(clearServerErrors('confirmContact'));
+        contactsService.confirmToFriend(id).then(
+            response => {
+                const normalizedUser = normalize(response.data.recipient, userSchema);
+                const id = normalizedUser.result;
+                dispatch(addContactToFriends(id));
+                dispatch(removeContactFromRequests(id));
+                dispatch(confirmingNewFriendSuccess());
+            },
+            error => {
+                dispatch(confirmingNewFriendFailure());
+                dispatch(setErrors('confirmContact', error));
+            }
+        )
+    }
+};
+
+export const addToFriendsFromRequested = sender => {
+    return dispatch => {
+        const normalizedUser = normalize(sender, userSchema);
+        const id = normalizedUser.result;
+        const user = normalizedUser.entities.users[id];
+        dispatch(setUser(id, user));
+        dispatch(removeContactFromPending(id));
+        dispatch(addContactToFriends(id));
+    }
+};
