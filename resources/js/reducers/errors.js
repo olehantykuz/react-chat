@@ -4,6 +4,7 @@ const initialState = {
     login: [],
     register: [],
     requestContact: [],
+    confirmContact: [],
 };
 
 const errors = (state = initialState, action) => {
