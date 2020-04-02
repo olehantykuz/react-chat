@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Events\FriendConfirm;
 use App\Events\FriendRequest;
 use App\Http\Controllers\ApiController;
 use App\Models\User;
@@ -78,9 +79,13 @@ class ContactController extends ApiController
         $sender = Auth::user();
         $result = $this->userService->confirmFriendsInvite($sender, $user);
 
-        return $result
-            ? response()->json(['error' => 'Friend request not found'], 404)
-            : response()->json(['id' => $result], 200);
+        if ($result) {
+            broadcast(new FriendConfirm($sender, $user))->toOthers();
+
+            return response()->json(['recipient' => new UserResource($user)], 200);
+        }
+
+        return response()->json(['error' => 'Friend request not found'], 404);
     }
 
 }
