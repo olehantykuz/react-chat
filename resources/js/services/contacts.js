@@ -19,8 +19,17 @@ const requestToFriend = id => {
     }).then(response => response);
 };
 
+const confirmToFriend = id => {
+    return axios({
+        url: `${baseUrl}/${id}/friends/confirm`,
+        method: 'put',
+        headers: authHeader(),
+    }).then(response => response);
+};
+
 export const contactsService = {
     findNew,
-    requestToFriend
+    requestToFriend,
+    confirmToFriend,
 };
 
