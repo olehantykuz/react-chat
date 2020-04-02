@@ -63,6 +63,7 @@ function SearchNewContacts(props) {
                                 <button
                                     className="btn btn-outline-success"
                                     onClick={() => {handleClick(contact.id)}}
+                                    disabled={props.contacts.isRequestedNewFriend}
                                 >+</button>
                                 <span>{contact.name} ({contact.email})</span>
                             </div>
