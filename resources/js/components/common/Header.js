@@ -3,15 +3,19 @@ import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { isLoggedIn } from '../../helpers';
-import { logoutUser } from '../../actions/auth';
-import { clearMessages } from '../../actions/chat';
+import { logoutUser } from '../../actions/logout';
+import { clearChatMessages } from '../../actions/chat';
 
 function Header(props) {
     const logoutHandle = e => {
         e.preventDefault();
         props.logout();
-        props.clearMessages();
     };
+
+    const authId = props.auth.id;
+    const userName = (authId && props.users[authId] !== undefined)
+        ? props.users[authId].name
+        : 'username';
 
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-white shadow-sm mb-4">
@@ -44,7 +48,7 @@ function Header(props) {
                             <li className="nav-item dropdown">
                                 <a id="navbarDropdown" className="nav-link dropdown-toggle" href="#" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {props.user.profile.name || 'username'} <span className="caret"></span>
+                                    {userName} <span className="caret"></span>
                                 </a>
 
                                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -63,11 +67,12 @@ function Header(props) {
 }
 
 const mapStateToProps = state => ({
-    user: state.user
+    users: state.users,
+    auth: state.auth
 });
 const mapDispatchToProps = dispatch => ({
     logout: () => dispatch(logoutUser()),
-    clearMessages: () => dispatch(clearMessages())
+    clearMessages: () => dispatch(clearChatMessages())
 });
 
 export default withRouter(

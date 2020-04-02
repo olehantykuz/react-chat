@@ -27,7 +27,10 @@ const hasError = (errors = {}) => {
     return false;
 };
 
-const processServerErrors = errors => {
+const processServerErrors = data => {
+    const body = data.response.data;
+    const errors = body.errors || (body.error ? [body.error] : [body.message]);
+
     let result = [];
     if (isObject(errors)) {
         for (let key in errors) {

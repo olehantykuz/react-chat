@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function Password(props) {
     const key = props.confirm ? 'passwordConfirmation' : 'password';
@@ -54,3 +55,13 @@ function Password(props) {
 }
 
 export default Password;
+
+Password.propTypes = {
+    value: PropTypes.string.isRequired,
+    errors: PropTypes.object.isRequired,
+    changeHandler: PropTypes.func.isRequired,
+    setErrors: PropTypes.func.isRequired,
+    handleTouch: PropTypes.func.isRequired,
+    touched: PropTypes.bool.isRequired,
+    confirm: PropTypes.bool
+};

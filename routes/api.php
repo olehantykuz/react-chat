@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,8 +24,17 @@ Route::group(['namespace' => 'App'], function () {
         Route::post('refresh', 'AuthController@refresh');
         Route::get('me', 'AuthController@me');
     });
-    Route::group(['middleware' => 'auth:api', 'prefix' => 'chat'], function () {
-        Route::get('messages', 'ChatsController@fetchMessages');
-        Route::post('messages', 'ChatsController@sendMessage');
+    Route::group(['middleware' => 'auth:api'], function () {
+        Route::group(['prefix' => 'chat'], function () {
+            Route::group(['prefix' => 'messages'], function () {
+                Route::get('/', 'ChatsController@fetchMessages');
+                Route::post('/', 'ChatsController@sendMessage');
+            });
+        });
+        Route::group(['prefix' => 'contacts'], function () {
+            Route::get('search/new', 'ContactController@searchNewContacts');
+            Route::post('{user}/friends/add', 'ContactController@addToFriend');
+            Route::put('{user}/friends/confirm', 'ContactController@confirmFriend');
+        });
     });
 });

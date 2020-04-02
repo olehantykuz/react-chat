@@ -35,7 +35,7 @@ const logout = () => {
     });
 };
 
-const getProfile = () => {
+const getAuthUser = () => {
     return axios({
         url: `${baseUrl}/me`,
         method: 'get',
@@ -47,5 +47,5 @@ export const userService = {
     login,
     logout,
     register,
-    getProfile,
+    getAuthUser,
 };

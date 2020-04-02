@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { hasError, processServerErrors } from '../../helpers';
+import { hasError } from '../../helpers';
 import Username from './fields/Username';
 import Email from './fields/Email';
 import Password from './fields/Password';
 import ConfirmPassword from './fields/ConfirmPassword';
 import ServerErrors from './fields/ServerErrors';
-import {clearServerErrors, register} from '../../actions/auth';
+import {register} from '../../actions/auth';
+import {clearServerErrors} from '../../actions/errors';
 
 function Register(props) {
     const [errors, setErrors] = useState({});
@@ -137,7 +138,7 @@ function Register(props) {
                                     </div>
                                 </div>
                                 <ServerErrors
-                                    serverErrors={props.auth.errors.register}
+                                    serverErrors={props.errors.register}
                                 />
                             </form>
                         </div>
@@ -149,7 +150,8 @@ function Register(props) {
 }
 
 const mapStateToProps = state => ({
-    auth: state.auth
+    auth: state.auth,
+    errors: state.errors
 });
 
 const mapDispatchToProps = dispatch => ({

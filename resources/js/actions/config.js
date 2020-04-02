@@ -2,12 +2,17 @@ import Echo from 'laravel-echo';
 import { configService } from '../services/config';
 import { authHeader } from '../helpers';
 
+import {
+    SET_CONFIG,
+    CLEAR_CONFIG,
+} from '../actionTypes/config';
+
 export const setConfig = data => ({
-    type: 'SET_CONFIG',
+    type: SET_CONFIG,
     data,
 });
 const clearConfig = () => ({
-    type: 'CLEAR_CONFIG',
+    type: CLEAR_CONFIG,
 });
 
 export const fetchConfig = () => {

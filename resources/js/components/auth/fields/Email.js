@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function Email(props) {
     const key = 'email';
@@ -54,3 +55,12 @@ function Email(props) {
 }
 
 export default Email;
+
+Email.propTypes = {
+    value: PropTypes.string.isRequired,
+    errors: PropTypes.object.isRequired,
+    changeHandler: PropTypes.func.isRequired,
+    setErrors: PropTypes.func.isRequired,
+    handleTouch: PropTypes.func.isRequired,
+    touched: PropTypes.bool.isRequired
+};

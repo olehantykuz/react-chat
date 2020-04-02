@@ -4,15 +4,22 @@ namespace App\Http\Controllers\App;
 
 use App\Http\Requests\LoginApiRequest;
 use App\Http\Resources\User as UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\RegisterApiRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends ApiController
 {
+    /**
+     * @var UserService
+     */
+    protected $userService;
+
     /**
      * Create a new AuthController instance.
      *
@@ -22,21 +29,21 @@ class AuthController extends ApiController
     {
         parent::__construct();
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->userService = new UserService();
     }
 
     /**
      * @param Request $request
-     * @param UserService $service
      * @return JsonResponse
      */
-    public function register(Request $request, UserService $service)
+    public function register(Request $request)
     {
         $validator = Validator::make($request->all(), with(new RegisterApiRequest())->rules());
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $service->create($request->all());
+        $this->userService->create($request->all());
 
         return new JsonResponse('', 201);
     }
@@ -69,7 +76,10 @@ class AuthController extends ApiController
      */
     public function me()
     {
-        return response()->json(['user' => new UserResource(auth($this->guard)->user())]);
+        /** @var User $user */
+        $user = Auth::user();
+
+        return response()->json(['user' => new UserResource($this->userService->loadFriendRelations($user))]);
     }
 
     /**
@@ -79,7 +89,7 @@ class AuthController extends ApiController
      */
     public function logout()
     {
-        auth($this->guard)->logout();
+        Auth::logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -97,17 +107,20 @@ class AuthController extends ApiController
     /**
      * Get the token array structure.
      *
-     * @param  string $token
+     * @param string $token
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse`
      */
     protected function respondWithToken($token)
     {
+        /** @var User $user */
+        $user = auth($this->guard)->user();
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth($this->guard)->factory()->getTTL() * 60,
-            'user' => new UserResource(auth($this->guard)->user()),
+            'user' => new UserResource($this->userService->loadFriendRelations($user)),
         ]);
     }
 }

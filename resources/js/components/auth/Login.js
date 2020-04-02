@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import {clearRegisterStatus, clearServerErrors, login} from '../../actions/auth';
+import {clearRegisterStatus, login} from '../../actions/auth';
+import {clearServerErrors} from '../../actions/errors';
 
 import { hasError } from '../../helpers';
 import Email from './fields/Email';
@@ -98,7 +99,7 @@ function Login(props) {
                                     </div>
                                 </div>
                                 <ServerErrors
-                                    serverErrors={props.auth.errors.login}
+                                    serverErrors={props.errors.login}
                                 />
                             </form>
                         </div>
@@ -110,7 +111,8 @@ function Login(props) {
 }
 
 const mapStateToProps = state => ({
-    auth: state.auth
+    auth: state.auth,
+    errors: state.errors,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -7,7 +7,7 @@ import {
 import { connect } from 'react-redux';
 
 import { history } from './history';
-import { fetchUser } from './actions/user';
+import { fetchUser } from './actions/auth';
 import { fetchConfig } from './actions/config';
 import { isLoggedIn } from './helpers';
 
@@ -20,7 +20,7 @@ function Root(props) {
         if (Object.keys(props.config).length === 0) {
             props.fetchConfig();
         }
-        if (isLoggedIn()) {
+        if (isLoggedIn() && !props.auth.fetchingAuthUser) {
             props.fetchUser();
         }
     }, []);
@@ -43,7 +43,7 @@ function Root(props) {
 }
 
 const mapStateToProps = state => ({
-    user: state.user,
+    auth: state.auth,
     config: state.config,
 });
 const mapDispatchToProps = dispatch => ({
