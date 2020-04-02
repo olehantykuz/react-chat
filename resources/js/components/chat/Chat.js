@@ -5,6 +5,7 @@ import ChatMessages from './ChatMessages';
 import ChatMessagesForm from './ChatMessagesForm';
 import SearchNewContacts from './SearchNewContacts';
 import PendingContacts from './PendingContacts';
+import Friends from './Friends';
 import { isLoggedIn } from '../../helpers';
 import { addNewChatMessage, fetchMessages } from '../../actions/chat';
 import { addFriendRequest, addToFriendsFromRequested } from '../../actions/contacts';
@@ -57,7 +58,7 @@ function Chat(props) {
             <div className="col-md-3">
                 <div className="card w-100">
                     <div className="card-body">
-                        <h5>Friends</h5>
+                        <Friends />
                     </div>
                 </div>
                 <div className="card w-100">
