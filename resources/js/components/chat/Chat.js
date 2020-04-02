@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import ChatMessages from './ChatMessages';
 import ChatMessagesForm from './ChatMessagesForm';
 import SearchNewContacts from './SearchNewContacts';
+import PendingContacts from './PendingContacts';
 import { isLoggedIn } from '../../helpers';
 import { addNewChatMessage, fetchMessages } from '../../actions/chat';
 import { addFriendRequest } from '../../actions/contacts';
@@ -28,6 +29,7 @@ function Chat(props) {
                 });
             Echo.channel(adFriendChannelName)
                 .listen('.request.friend', e => {
+                    console.log(e);
                     props.addFriendRequest(e.sender);
                 });
         }
@@ -46,7 +48,19 @@ function Chat(props) {
 
     return (
         <div className="row justify-content-center">
-            <div className="col-md-8">
+            <div className="col-md-3">
+                <div className="card w-100">
+                    <div className="card-body">
+                        <h5>Friends</h5>
+                    </div>
+                </div>
+                <div className="card w-100">
+                    <div className="card-body">
+                        <h5>Groups</h5>
+                    </div>
+                </div>
+            </div>
+            <div className="col-md-6">
                 <div className="card w-100">
                     <div className="card-body">
                         <div className="panel panel-default">
@@ -70,14 +84,14 @@ function Chat(props) {
                 </div>
                 <div className="card w-100">
                     <div className="card-body">
-                        <h5>Friends</h5>
+                        <PendingContacts />
                     </div>
                 </div>
-                <div className="card w-100">
-                    <div className="card-body">
-                        <h5>Groups</h5>
-                    </div>
-                </div>
+                {/*<div className="card w-100">*/}
+                {/*    <div className="card-body">*/}
+                {/*        <h5>Groups</h5>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
             </div>
         </div>
     );

@@ -1,4 +1,12 @@
-.new_contacts {
+.search-contacts {
+    .alert {
+        margin: auto;
+    }
+}
+
+.new_contacts,
+.requested_contacts,
+.invitation_contacts {
     &--item {
         border-bottom: 1px solid grey;
         padding: 5px;
@@ -10,6 +18,7 @@
 
         span {
             padding-left: 5px;
+            padding-right: 5px;
         }
     }
 }

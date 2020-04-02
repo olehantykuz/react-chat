@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 
 import { contactsService } from '../../services/contacts';
 import { sendFriendRequest } from '../../actions/contacts';
+import {clearServerErrors} from '../../actions/errors';
+import ServerErrors from '../auth/fields/ServerErrors';
 
 function SearchNewContacts(props) {
     const [query, setQuery] = useState('');
@@ -22,6 +24,7 @@ function SearchNewContacts(props) {
         }
 
         return () => {
+            props.clearServerErrors('requestContact');
             handler && clearTimeout(handler);
         };
     }, [query]);
@@ -32,12 +35,13 @@ function SearchNewContacts(props) {
 
     const handleClick = (id) => {
         props.sendFriendRequest(id);
+        setQuery('');
     };
 
     return (
         <Fragment>
             <h5 className="text-center">Find user</h5>
-            <div className="form-group row">
+            <div className="form-group row search-contacts">
                 <div className="col-sm-12">
                     <input
                         type="text"
@@ -47,6 +51,9 @@ function SearchNewContacts(props) {
                         onChange={handleQueryChange}
                     />
                 </div>
+                <ServerErrors
+                    serverErrors={props.errors.requestContact}
+                />
             </div>
             <div className="new_contacts">
                 {contacts.length > 0 && (
@@ -69,10 +76,13 @@ function SearchNewContacts(props) {
 
 const mapStateToProps = state => ({
     auth: state.auth,
-    config: state.config
+    config: state.config,
+    contacts: state.contacts,
+    errors: state.errors
 });
 const mapDispatchToProps = dispatch => ({
-    sendFriendRequest: id => dispatch(sendFriendRequest(id))
+    sendFriendRequest: id => dispatch(sendFriendRequest(id)),
+    clearServerErrors: field => dispatch(clearServerErrors(field)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchNewContacts);
