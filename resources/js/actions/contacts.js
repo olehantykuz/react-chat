@@ -22,11 +22,12 @@ import {
     ADD_CONTACT_TO_REQUESTS,
     REMOVE_CONTACT_FROM_REQUESTS
 } from '../actionTypes/contacts';
+import {clearServerErrors, setErrors} from './errors';
 
 export const clearContacts = () => ({
     type: CLEAR_CONTACTS
 });
-const setPendingContacts = ids => ({
+export const setPendingContacts = ids => ({
     type: SET_PENDING_CONTACTS,
     ids
 });
@@ -39,7 +40,7 @@ const removeContactFromPending = id => ({
     id
 });
 
-const setFriendsContacts = ids => ({
+export const setFriendsContacts = ids => ({
     type: SET_FRIENDS,
     ids
 });
@@ -52,7 +53,7 @@ const removeContactFromFriends = id => ({
     id
 });
 
-const setRequestsContacts = ids => ({
+export const setRequestsContacts = ids => ({
     type: SET_REQUESTS_CONTACTS,
     ids
 });
@@ -87,6 +88,7 @@ const confirmingNewFriendFailure = () => ({
 export const sendFriendRequest = id => {
     return dispatch => {
         dispatch(requestingNewFriend());
+        dispatch(clearServerErrors('requestContact'));
         contactsService.requestToFriend(id).then(
             response => {
                 const normalizedUser = normalize(response.data.recipient, userSchema);
@@ -98,6 +100,7 @@ export const sendFriendRequest = id => {
             },
             error => {
                 dispatch(requestingNewFriendFailure());
+                dispatch(setErrors('requestContact', error));
             }
         )
     }

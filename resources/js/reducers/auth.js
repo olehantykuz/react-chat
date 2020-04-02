@@ -8,8 +8,6 @@ import {
     REGISTER_SUCCESS,
     REGISTER_FAILURE,
     CLEAR_REGISTER_STATUS,
-    SET_SERVER_ERRORS,
-    CLEAR_SERVER_ERRORS,
     FETCHING_AUTH_USER,
     FETCHING_AUTH_USER_SUCCESS,
     FETCHING_AUTH_USER_FAILURE,
@@ -17,10 +15,6 @@ import {
 
 const initialState = {
     id: null,
-    errors: {
-        login: [],
-        register: [],
-    },
     isRequestRegister: false,
     registerStatus: null,
     isRequestLogin: false,
@@ -30,7 +24,7 @@ const initialState = {
     fetchingAuthUserStatus: null
 };
 
-const auth = (state=initialState, action) => {
+const auth = (state= initialState, action) => {
     switch (action.type) {
         case REQUEST_LOGIN: {
             return {...state, isRequestLogin: true}
@@ -77,24 +71,6 @@ const auth = (state=initialState, action) => {
         }
         case CLEAR_REGISTER_STATUS: {
             return {...state, registerStatus: null}
-        }
-        case SET_SERVER_ERRORS: {
-            const { field, value } = action;
-            const errors = Object.assign({}, {
-                ...state.errors,
-                [field]: value
-            });
-
-            return {...state, errors }
-        }
-        case CLEAR_SERVER_ERRORS: {
-            const { field } = action;
-            const errors = Object.assign({}, {
-                ...state.errors,
-                [field]: []
-            });
-
-            return {...state, errors }
         }
         case FETCHING_AUTH_USER: {
             return {...state, fetchingAuthUser: true, id: action.id};

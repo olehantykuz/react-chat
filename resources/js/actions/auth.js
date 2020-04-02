@@ -1,10 +1,11 @@
 import { normalize } from 'normalizr';
-import { userSchema } from '../schemas';
+import { userSchemaWithContacts } from '../schemas';
 
 import { userService } from '../services/auth';
-import { processServerErrors } from '../helpers';
 import { history } from '../history';
-import { setUser } from './users';
+import { clearServerErrors, setErrors } from './errors';
+import { addUsers } from './users';
+import { setPendingContacts, setFriendsContacts, setRequestsContacts } from './contacts';
 
 import {
     REQUEST_LOGIN,
@@ -15,9 +16,6 @@ import {
     REGISTER_SUCCESS,
     REGISTER_FAILURE,
     CLEAR_REGISTER_STATUS,
-    SET_SERVER_ERRORS,
-    CLEAR_SERVER_ERRORS,
-
     FETCHING_AUTH_USER,
     FETCHING_AUTH_USER_SUCCESS,
     FETCHING_AUTH_USER_FAILURE,
@@ -49,16 +47,6 @@ export const clearRegisterStatus = () => ({
     type: CLEAR_REGISTER_STATUS
 });
 
-const setServerErrors = (field, value) => ({
-    type: SET_SERVER_ERRORS,
-    field,
-    value
-});
-export const clearServerErrors = field => ({
-    type: CLEAR_SERVER_ERRORS,
-    field
-});
-
 const fetchingAuthUser = () => ({
     type: FETCHING_AUTH_USER
 });
@@ -81,8 +69,7 @@ export const login = data => {
             history.push('/');
         }, error => {
             dispatch(loginFailure());
-            const err = processServerErrors(error.response.data.errors || [error.response.data.error]);
-            dispatch(setServerErrors('login', err));
+            dispatch(setErrors('login', error));
         })
     }
 };
@@ -96,8 +83,7 @@ export const register = data => {
             history.push('/login')
         }, error => {
             dispatch(registerFailure());
-            const err = processServerErrors(error.response.data.errors || [error.response.data.error]);
-            dispatch(setServerErrors('register', err));
+            dispatch(setErrors('register', error));
         })
     }
 };
@@ -105,11 +91,15 @@ export const register = data => {
 export const fetchUser = () => {
     return dispatch => {
         dispatch(fetchingAuthUser());
-        userService.getProfile().then(response => {
-            const normalizedResponse = normalize(response.data.user, userSchema);
+        userService.getAuthUser().then(response => {
+            const normalizedResponse = normalize(response.data.user, userSchemaWithContacts);
             const id = normalizedResponse.result;
-            const user = normalizedResponse.entities.users[id];
-            dispatch(setUser(id, user));
+            const { users } = normalizedResponse.entities;
+            const user = users[id];
+            dispatch(addUsers(users));
+            user.hasOwnProperty('requestedFriendsTo') && dispatch(setPendingContacts(user.requestedFriendsTo));
+            user.hasOwnProperty('requestFriendsBy') && dispatch(setRequestsContacts(user.requestFriendsBy));
+            user.hasOwnProperty('friends') && dispatch(setFriendsContacts(user.friends));
             dispatch(fetchingAuthUserSuccess(id));
         },error => {
             console.log({error});
