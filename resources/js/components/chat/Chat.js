@@ -7,17 +7,21 @@ import SearchNewContacts from './SearchNewContacts';
 import PendingContacts from './PendingContacts';
 import { isLoggedIn } from '../../helpers';
 import { addNewChatMessage, fetchMessages } from '../../actions/chat';
-import { addFriendRequest } from '../../actions/contacts';
+import { addFriendRequest, addToFriendsFromRequested } from '../../actions/contacts';
 
 function Chat(props) {
     useEffect(() => {
-        const hasConfigs = props.config.broadcastChannelPrefix !== undefined;
+        const { broadcastChannelPrefix } = props.config;
+        const hasConfigs = broadcastChannelPrefix !== undefined;
         let chatChannelName = '';
-        let adFriendChannelName = '';
+        let addFriendChannelName = '';
+        let confirmedFriendChannelName = '';
 
         if (hasConfigs && props.auth.id) {
-            chatChannelName = props.config.broadcastChannelPrefix + 'private-chat';
-            adFriendChannelName = props.config.broadcastChannelPrefix + 'private-request.friend.to.' + props.auth.id;
+            chatChannelName = broadcastChannelPrefix + 'private-chat';
+            addFriendChannelName = broadcastChannelPrefix + 'private-request.friend.to.' + props.auth.id;
+            confirmedFriendChannelName =broadcastChannelPrefix + 'private-confirm.friend.to.' + props.auth.id;
+
             Echo.channel(chatChannelName)
                 .listen('.message.send', e => {
                     const { message } = e;
@@ -27,10 +31,13 @@ function Chat(props) {
                         props.addNewChatMessage(message);
                     }
                 });
-            Echo.channel(adFriendChannelName)
+            Echo.channel(addFriendChannelName)
                 .listen('.request.friend', e => {
-                    console.log(e);
                     props.addFriendRequest(e.sender);
+                });
+            Echo.channel(confirmedFriendChannelName)
+                .listen('.confirm.friend', e => {
+                    props.addToFriendsFromRequested(e.sender);
                 });
         }
 
@@ -40,11 +47,10 @@ function Chat(props) {
 
         return () => {
             chatChannelName && Echo.leave(chatChannelName);
-            adFriendChannelName && Echo.leave(adFriendChannelName);
+            addFriendChannelName && Echo.leave(addFriendChannelName);
         }
 
     }, [props.config, props.auth.id]);
-
 
     return (
         <div className="row justify-content-center">
@@ -87,11 +93,6 @@ function Chat(props) {
                         <PendingContacts />
                     </div>
                 </div>
-                {/*<div className="card w-100">*/}
-                {/*    <div className="card-body">*/}
-                {/*        <h5>Groups</h5>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
             </div>
         </div>
     );
@@ -108,6 +109,7 @@ const mapDispatchToProps = dispatch => ({
     fetchMessages: () => dispatch(fetchMessages()),
     addNewChatMessage: payload => dispatch(addNewChatMessage(payload)),
     addFriendRequest: payload => dispatch(addFriendRequest(payload)),
+    addToFriendsFromRequested: payload => dispatch(addToFriendsFromRequested(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Chat);
