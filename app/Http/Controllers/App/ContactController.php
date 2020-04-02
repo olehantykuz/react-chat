@@ -42,7 +42,9 @@ class ContactController extends ApiController
         }
 
         $query = $request->get('query', '');
-        $users = $this->userService->findNewContacts($query, Auth::id());
+        /** @var User $authUser */
+        $authUser = Auth::user();
+        $users = $this->userService->findNewContacts($query, $authUser);
 
         return UserResource::collection($users);
     }
@@ -63,7 +65,7 @@ class ContactController extends ApiController
             return response()->json(['recipient' => new UserResource($user)], 200);
         }
 
-        return response()->json(['contact' => 'Contact already exists'], 400);
+        return response()->json(['error' => 'Contact already exists'], 400);
     }
 
     /**
@@ -77,7 +79,7 @@ class ContactController extends ApiController
         $result = $this->userService->confirmFriendsInvite($sender, $user);
 
         return $result
-            ? response()->json(['contact' => 'Friend request not found'], 404)
+            ? response()->json(['error' => 'Friend request not found'], 404)
             : response()->json(['id' => $result], 200);
     }
 

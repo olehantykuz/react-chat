@@ -4,6 +4,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -25,20 +26,21 @@ class UserService
 
     /**
      * @param string $query
-     * @param int $senderId
+     * @param User $user
      * @param int|null $count
      * @return mixed
      */
-    public function findNewContacts(?string $query, int $senderId, ?int $count = 5)
+    public function findNewContacts(?string $query, User $user, ?int $count = 5)
     {
-        $excludeIds = [$senderId];
+        $excludeIds = collect([$user->id])->merge($user->contacted->pluck('id'));
 
-        if (!$query || $query === ' ') {
-            $q = User::whereNotIn('id', $excludeIds);
-        } else {
-            $q = User::where('name', 'like', '%' . $query . '%')
-                ->orWhere('email', 'like', '%' . $query . '%')
-                ->whereNotIn('id', $excludeIds);
+        /** @var Builder $q */
+        $q = User::whereNotIn('id', $excludeIds);
+        if ($query && $query !== ' ') {
+            $q->where(function (Builder $sql) use ($query) {
+                $sql->where('name', 'like', '%' . $query . '%')
+                    ->orWhere('email', 'like', '%' . $query . '%');
+            });
         }
 
         return $q->take($count)
