@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -12,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\User
@@ -54,10 +56,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static Builder|User whereRememberToken($value)
  * @method static Builder|User whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property Carbon|null $deleted_at
+ * @property-read Collection|Room[] $rooms
+ * @property-read int|null $rooms_count
+ * @method static bool|null forceDelete()
+ * @method static QueryBuilder|User onlyTrashed()
+ * @method static bool|null restore()
+ * @method static Builder|User whereDeletedAt($value)
+ * @method static QueryBuilder|User withTrashed()
+ * @method static QueryBuilder|User withoutTrashed()
  */
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use Notifiable,
+        SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -94,6 +106,32 @@ class User extends Authenticatable implements JWTSubject
     public function messages()
     {
         return $this->hasMany(Message::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function rooms()
+    {
+        return $this->belongsToMany(Room::class, 'room_user');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function groupRooms()
+    {
+        return $this->rooms()
+            ->where('is_group', true);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function individualRooms()
+    {
+        return $this->rooms()
+            ->where('is_group', false);
     }
 
     /**

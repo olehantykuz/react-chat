@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\Message
@@ -25,9 +27,21 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Message whereUpdatedAt($value)
  * @method static Builder|Message whereUserId($value)
  * @mixin \Eloquent
+ * @property int $room_id
+ * @property Carbon|null $deleted_at
+ * @property-read Room $room
+ * @method static bool|null forceDelete()
+ * @method static QueryBuilder|Message onlyTrashed()
+ * @method static bool|null restore()
+ * @method static Builder|Message whereDeletedAt($value)
+ * @method static Builder|Message whereRoomId($value)
+ * @method static QueryBuilder|Message withTrashed()
+ * @method static QueryBuilder|Message withoutTrashed()
  */
 class Message extends Model
 {
+    use SoftDeletes;
+
     /**
      * Fields that are mass assignable
      *
@@ -45,5 +59,8 @@ class Message extends Model
         return $this->belongsTo(User::class);
     }
 
-
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
 }
