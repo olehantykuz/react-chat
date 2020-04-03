@@ -6,7 +6,6 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class UserService
@@ -20,7 +19,7 @@ class UserService
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => \Hash::make($data['password']),
         ]);
     }
 
@@ -33,8 +32,6 @@ class UserService
     public function findNewContacts(?string $query, User $user, ?int $count = 5)
     {
         $excludeIds = collect([$user->id])->merge($user->contacted->pluck('id'));
-
-        /** @var Builder $q */
         $q = User::whereNotIn('id', $excludeIds);
         if ($query && $query !== ' ') {
             $q->where(function (Builder $sql) use ($query) {

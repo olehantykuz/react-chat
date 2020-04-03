@@ -38,7 +38,7 @@ class AuthController extends ApiController
      */
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), with(new RegisterApiRequest())->rules());
+        $validator = \Validator::make($request->all(), with(new RegisterApiRequest())->rules());
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
@@ -51,11 +51,12 @@ class AuthController extends ApiController
     /**
      * Get a JWT via given credentials.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), with(new LoginApiRequest())->rules());
+        $validator = \Validator::make($request->all(), with(new LoginApiRequest())->rules());
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
@@ -72,12 +73,12 @@ class AuthController extends ApiController
     /**
      * Get the authenticated User.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function me()
     {
         /** @var User $user */
-        $user = Auth::user();
+        $user = \Auth::user();
 
         return response()->json(['user' => new UserResource($this->userService->loadFriendRelations($user))]);
     }
@@ -85,11 +86,11 @@ class AuthController extends ApiController
     /**
      * Log the user out (Invalidate the token).
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function logout()
     {
-        Auth::logout();
+        \Auth::logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -97,7 +98,7 @@ class AuthController extends ApiController
     /**
      * Refresh a token.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function refresh()
     {
@@ -109,7 +110,7 @@ class AuthController extends ApiController
      *
      * @param string $token
      *
-     * @return \Illuminate\Http\JsonResponse`
+     * @return JsonResponse
      */
     protected function respondWithToken($token)
     {

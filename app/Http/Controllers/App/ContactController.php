@@ -7,9 +7,8 @@ use App\Events\FriendRequest;
 use App\Http\Controllers\ApiController;
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\User as UserResource;
 
@@ -33,8 +32,8 @@ class ContactController extends ApiController
      */
     public function searchNewContacts(Request $request)
     {
-        /** @var \Illuminate\Contracts\Validation\Validator $validator */
-        $validator = Validator::make($request->all(), [
+        /** @var Validator $validator */
+        $validator = \Validator::make($request->all(), [
             'query' => 'nullable|string'
         ]);
         if ($validator->fails()) {
@@ -44,7 +43,7 @@ class ContactController extends ApiController
 
         $query = $request->get('query', '');
         /** @var User $authUser */
-        $authUser = Auth::user();
+        $authUser = \Auth::user();
         $users = $this->userService->findNewContacts($query, $authUser);
 
         return UserResource::collection($users);
@@ -57,7 +56,7 @@ class ContactController extends ApiController
     public function addToFriend(User $user)
     {
         /** @var User $sender */
-        $sender = Auth::user();
+        $sender = \Auth::user();
 
         $result = $this->userService->requestToFriend($sender, $user);
         if ($result) {
@@ -76,7 +75,7 @@ class ContactController extends ApiController
     public function confirmFriend(User $user)
     {
         /** @var User $sender */
-        $sender = Auth::user();
+        $sender = \Auth::user();
         $result = $this->userService->confirmFriendsInvite($sender, $user);
 
         if ($result) {

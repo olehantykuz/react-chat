@@ -7,9 +7,8 @@ use App\Http\Requests\CreateMessage;
 use App\Models\User;
 use App\Services\MessageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use App\Events\MessageSent;
+use Illuminate\Http\JsonResponse;
 
 class ChatsController extends ApiController
 {
@@ -24,7 +23,7 @@ class ChatsController extends ApiController
     /**
      * Fetch all messages
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function fetchMessages()
     {
@@ -37,17 +36,17 @@ class ChatsController extends ApiController
      * Save message
      *
      * @param  Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function sendMessage(Request $request)
     {
-        $validator = Validator::make($request->all(), with(new CreateMessage())->rules());
+        $validator = \Validator::make($request->all(), with(new CreateMessage())->rules());
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
         /** @var User $user */
-        $user = Auth::user();
+        $user = \Auth::user();
         $message = $this->messageService->create(
             $user, $request->input('text')
         );
