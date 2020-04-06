@@ -17,17 +17,20 @@ class FriendConfirm implements ShouldBroadcast
 
     public $sender;
     public $recipient;
+    public $roomId;
 
     /**
      * Create a new event instance.
      *
      * @param User $sender
      * @param User $recipient
+     * @param int $roomId
      */
-    public function __construct(User $sender, User $recipient)
+    public function __construct(User $sender, User $recipient, int $roomId)
     {
         $this->sender = $sender->withoutRelations();
         $this->recipient = $recipient;
+        $this->roomId = $roomId;
     }
 
     /**

@@ -4,19 +4,23 @@ namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\CreateMessage;
+use App\Models\Room;
 use App\Models\User;
 use App\Services\MessageService;
+use App\Services\RoomService;
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
 use Illuminate\Http\JsonResponse;
 
-class ChatsController extends ApiController
+class RoomsController extends ApiController
 {
     protected $messageService;
+    protected $roomService;
 
     public function __construct()
     {
         $this->messageService = new MessageService();
+        $this->roomService = new RoomService();
         parent::__construct();
     }
 

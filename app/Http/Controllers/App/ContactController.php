@@ -6,6 +6,7 @@ use App\Events\FriendConfirm;
 use App\Events\FriendRequest;
 use App\Http\Controllers\ApiController;
 use App\Models\User;
+use App\Services\RoomService;
 use App\Services\UserService;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ class ContactController extends ApiController
 {
     /** @var UserService  */
     protected $userService;
+    /** @var RoomService  */
+    protected $roomService;
 
     /**
      * ContactController constructor.
@@ -23,6 +26,7 @@ class ContactController extends ApiController
     public function __construct()
     {
         $this->userService = new UserService();
+        $this->roomService = new RoomService();
         parent::__construct();
     }
 
@@ -79,9 +83,13 @@ class ContactController extends ApiController
         $result = $this->userService->confirmFriendsInvite($sender, $user);
 
         if ($result) {
-            broadcast(new FriendConfirm($sender, $user))->toOthers();
+            $room = $this->roomService->create(collect([$sender->id, $user->id]));
+            broadcast(new FriendConfirm($sender, $user, $room->id))->toOthers();
 
-            return response()->json(['recipient' => new UserResource($user)], 200);
+            return response()->json([
+                'recipient' => new UserResource($user),
+                'roomId' => $room->id,
+            ], 200);
         }
 
         return response()->json(['error' => 'Friend request not found'], 404);
