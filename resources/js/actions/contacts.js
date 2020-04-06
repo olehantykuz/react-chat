@@ -142,7 +142,7 @@ export const addToFriendsFromRequested = sender => {
         const id = normalizedUser.result;
         const user = normalizedUser.entities.users[id];
         dispatch(setUser(id, user));
-        dispatch(removeContactFromPending(id));
         dispatch(addContactToFriends(id));
+        dispatch(removeContactFromPending(id));
     }
 };

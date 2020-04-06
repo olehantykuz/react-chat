@@ -5,9 +5,9 @@ function Friends(props) {
     return (
         <Fragment>
             <h5 className="text-center">Friends</h5>
-            {props.friends.length > 0 &&
+            {props.contacts.friends.length > 0 &&
             <div className="friends_contacts">
-                {props.friends.map((id, index) => {
+                {props.contacts.friends.map((id, index) => {
                     const user = props.users[id];
 
                     return user !== undefined ? (
@@ -23,7 +23,7 @@ function Friends(props) {
 }
 
 const mapStateToProps = state => ({
-    friends: state.contacts.friends,
+    contacts: state.contacts,
     users: state.users,
 });
 
