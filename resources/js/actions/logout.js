@@ -2,7 +2,8 @@ import { LOGOUT } from '../actionTypes/auth';
 import { userService } from '../services/auth';
 import { history } from '../history';
 import { clearUsers } from './users';
-import { clearChatMessages } from './chat';
+import { clearChats } from './chats';
+import { clearRooms } from './rooms';
 import { clearMessages } from './messages';
 import { clearAllErrors } from './errors';
 
@@ -13,11 +14,12 @@ export const logout = () => ({
 export const logoutUser = () => {
     return dispatch => {
         userService.logout().then(() => {
-            dispatch(clearChatMessages());
+            dispatch(clearChats());
             dispatch(logout());
             dispatch(clearUsers());
             dispatch(clearMessages());
             dispatch(clearAllErrors());
+            dispatch(clearRooms());
             history.push('/')
         });
     }
