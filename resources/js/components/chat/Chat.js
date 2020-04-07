@@ -45,8 +45,9 @@ function Chat(props) {
                 Echo.channel(cnName)
                     .listen('.message.send', e => {
                         const { message, room} = e;
-                        console.log({e, message, room, active: props.chats.active});
-                        props.addMessageToRoom(message, room.id);
+                        if (message.user_id !== props.auth.id) {
+                            props.addMessageToRoom(message, room.id);
+                        }
                     });
             });
         }
