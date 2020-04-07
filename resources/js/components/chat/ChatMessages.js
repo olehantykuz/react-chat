@@ -20,7 +20,7 @@ function ChatMessages (props) {
                         key={id}
                     />
                 );
-            })}
+            }).reverse()}
         </ul>
     );
 }
