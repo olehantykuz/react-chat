@@ -34,7 +34,15 @@
 
 .friends_contacts {
     &--item {
+        display: flex;
+        justify-content: space-between;
         cursor: pointer;
         border-bottom: 1px solid grey;
+
+        &--new_messages {
+            border: 1px solid red;
+            border-radius: 40%;
+            background: yellow;
+        }
     }
 }

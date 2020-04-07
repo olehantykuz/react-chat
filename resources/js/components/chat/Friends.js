@@ -28,6 +28,8 @@ function Friends(props) {
                 {props.contacts.friends.map((id, index) => {
                     const user = props.users[id];
                     const roomId = getRoomIdByFriendId(id);
+                    const numberNewMessages = props.chats[roomId].newMessages.length;
+
                     const cssClasses = `friends_contacts--item ${roomId === props.chats.active ? 'active' : ''}`;
 
                     return user !== undefined ? (
@@ -37,6 +39,9 @@ function Friends(props) {
                             onClick={() => handleClick(roomId)}
                         >
                             <span>{props.users[id].name} - {props.users[id].email}</span>
+                            {numberNewMessages > 0 &&
+                                <span className="friends_contacts--item--new_messages">{numberNewMessages}</span>
+                            }
                         </div>
                     ) : null;
                 })}
