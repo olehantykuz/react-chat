@@ -18,6 +18,7 @@ function ChatMessages (props) {
                         message={message}
                         user={user}
                         key={id}
+                        authId={props.auth.id}
                     />
                 );
             }).reverse()}
@@ -29,6 +30,7 @@ const mapStateToProps = state => ({
     users: state.users,
     messages: state.messages,
     chats: state.chats,
+    auth: state.auth,
 });
 
 export default connect(mapStateToProps)(ChatMessages);

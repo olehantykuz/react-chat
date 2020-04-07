@@ -8,13 +8,57 @@
     li {
         margin-bottom: 10px;
         padding-bottom: 5px;
-        border-bottom: 1px dotted #B3A9A9;
 
         .chat-body {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-end;
+            margin: 0 10px;
+            padding: 0 3px;
+            width: fit-content;
+
+            .header.left {
+                align-self: baseline;
+            }
+
             p {
                 margin: 0;
-                color: #777777;
+                color: black;
+                min-width: 100px;
+                border-radius: 3px;
+                padding: 3px;
             }
+
+            p.left {
+                background-color: bisque;
+            }
+            p.right {
+                background-color: #92ced2;
+            }
+
+            .arrow_say {
+                width: 0;
+                height: 0;
+                border-style: solid;
+            }
+
+            .arrow_say.left {
+                align-self: baseline;
+                margin-left: 3px;
+                border-color: bisque transparent transparent transparent;
+                border-width: 7px 7px 0 3px;
+            }
+
+            .arrow_say.right {
+                align-self: flex-end;
+                margin-right: 3px;
+                border-color: #92ced2 transparent transparent transparent;
+                border-width: 7px 3px 0 7px;
+            }
+        }
+
+        .chat-body.right {
+            float: right;
         }
     }
 }
