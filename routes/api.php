@@ -25,11 +25,9 @@ Route::group(['namespace' => 'App'], function () {
         Route::get('me', 'AuthController@me');
     });
     Route::group(['middleware' => 'auth:api'], function () {
-        Route::group(['prefix' => 'chat'], function () {
-            Route::group(['prefix' => 'messages'], function () {
-                Route::get('/', 'RoomsController@fetchMessages');
-                Route::post('/', 'RoomsController@sendMessage');
-            });
+        Route::group(['prefix' => 'rooms'], function () {
+            Route::get('{room}/conversation', 'RoomsController@fetchConversation');
+            Route::post('{room}/conversation', 'RoomsController@sendMessage');
         });
         Route::group(['prefix' => 'contacts'], function () {
             Route::get('search/new', 'ContactController@searchNewContacts');

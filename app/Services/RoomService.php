@@ -20,4 +20,15 @@ class RoomService
 
         return $room;
     }
+
+    /**
+     * @param Room $room
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getMessagesByRoom(Room $room)
+    {
+        return $room->messages()
+            ->with('user')
+            ->get();
+    }
 }

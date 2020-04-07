@@ -11,10 +11,17 @@ use App\Services\RoomService;
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\Message as MessageResource;
 
 class RoomsController extends ApiController
 {
+    /**
+     * @var MessageService
+     */
     protected $messageService;
+    /**
+     * @var RoomService
+     */
     protected $roomService;
 
     public function __construct()
@@ -25,24 +32,24 @@ class RoomsController extends ApiController
     }
 
     /**
-     * Fetch all messages
-     *
+     * @param Room $room
      * @return JsonResponse
      */
-    public function fetchMessages()
+    public function fetchConversation (Room $room)
     {
         return response()->json([
-            'messages' => $this->messageService->getAll()
+            'messages' => MessageResource::collection(
+                $this->roomService->getMessagesByRoom($room)
+            ),
         ]);
     }
 
     /**
-     * Save message
-     *
-     * @param  Request $request
+     * @param Room $room
+     * @param Request $request
      * @return JsonResponse
      */
-    public function sendMessage(Request $request)
+    public function sendMessage(Room $room, Request $request)
     {
         $validator = \Validator::make($request->all(), with(new CreateMessage())->rules());
         if ($validator->fails()) {
@@ -51,10 +58,8 @@ class RoomsController extends ApiController
 
         /** @var User $user */
         $user = \Auth::user();
-        $message = $this->messageService->create(
-            $user, $request->input('text')
-        );
-        broadcast(new MessageSent($message))->toOthers();
+        $message = $this->messageService->create($user, $room, $request->input('text'));
+        broadcast(new MessageSent($message, $room))->toOthers();
 
         return response()->json(['message' => $message]);
     }

@@ -82,13 +82,24 @@ class UserService
 
     /**
      * @param User $user
-     * @return User
+     * @return UserService
      */
-    public function loadFriendRelations(User $user)
+    public function loadFriends(User $user)
     {
         $user->load(['requestedFriendsTo', 'requestFriendsBy']);
         $user->friends;
 
-        return $user;
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     * @return UserService
+     */
+    public function loadRooms(User $user)
+    {
+        $user->load('rooms');
+
+        return $this;
     }
 }

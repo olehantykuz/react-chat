@@ -10,8 +10,6 @@ use App\Http\Controllers\ApiController;
 use App\Http\Requests\RegisterApiRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends ApiController
 {
@@ -79,8 +77,10 @@ class AuthController extends ApiController
     {
         /** @var User $user */
         $user = \Auth::user();
+        $this->userService->loadFriends($user)
+            ->loadRooms($user);
 
-        return response()->json(['user' => new UserResource($this->userService->loadFriendRelations($user))]);
+        return response()->json(['user' => new UserResource($user)]);
     }
 
     /**
@@ -116,12 +116,13 @@ class AuthController extends ApiController
     {
         /** @var User $user */
         $user = auth($this->guard)->user();
+        $this->userService->loadFriends($user);
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth($this->guard)->factory()->getTTL() * 60,
-            'user' => new UserResource($this->userService->loadFriendRelations($user)),
+            'user' => new UserResource($user),
         ]);
     }
 }
