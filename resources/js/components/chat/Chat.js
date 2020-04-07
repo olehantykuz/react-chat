@@ -62,10 +62,27 @@ function Chat(props) {
 
     }, [props.config, props.auth.id, props.rooms]);
 
-    const selectedRoomId = props.chats.active;
-    const chatName = selectedRoomId
-        ? (props.rooms[selectedRoomId].name || 'Room ' + selectedRoomId)
-        : 'No selected Chat';
+    const getChatName = () => {
+        const selectedRoomId = props.chats.active;
+
+        if (selectedRoomId) {
+            const room = props.rooms[selectedRoomId];
+            let chatName = room.name;
+
+            if (!chatName) {
+                const { authUserId } = props.auth;
+                const userId = room.users.find(id => {
+                    return id !== authUserId;
+                });
+                chatName = `Chat with ${props.users[userId].name}`
+            }
+
+            return chatName;
+        }
+
+        return 'No selected Chat';
+    };
+
     const { pending, requests } = props.contacts;
 
     return (
@@ -86,7 +103,7 @@ function Chat(props) {
                 <div className="card w-100">
                     <div className="card-body">
                         <div className="panel panel-default">
-                            <div className="panel-heading">{chatName}</div>
+                            <div className="panel-heading">{getChatName()}</div>
                             {!!props.chats.active && <Fragment>
                                 <div className="panel-body">
                                     <ChatMessages />
