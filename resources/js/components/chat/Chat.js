@@ -11,8 +11,10 @@ import { fetchChatMessages, addMessageToRoom } from '../../actions/chats';
 
 function Chat(props) {
     useEffect(() => {
-        if (props.chats.active) {
-            props.fetchChatMessages(props.chats.active);
+        const {active: roomId} = props.chats;
+
+        if (roomId && props.chats[roomId].messages.length === 0) {
+            props.fetchChatMessages(roomId);
         }
     }, [props.chats.active]);
 

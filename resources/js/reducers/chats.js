@@ -8,6 +8,8 @@ import {
     SENDING_CHAT_MESSAGE_SUCCESS,
     SET_CHAT_MESSAGES,
     ADD_MESSAGE_TO_CHAT,
+    MOVE_NEW_MESSAGES_TO_MESSAGES,
+    CLEAR_NEW_MESSAGES,
     TOGGLE_CHAT,
     CLEAR_CHATS,
 } from '../actionTypes/chats';
@@ -98,6 +100,21 @@ const chats = (state = initialState, action) => {
             } else {
                 chat.newMessages.push(message);
             }
+
+            return {...state, [id]: chat};
+        }
+        case MOVE_NEW_MESSAGES_TO_MESSAGES: {
+            const { id } = action;
+            const chat = Object.assign({}, state[id]);
+            chat.messages = chat.messages.concat(chat.newMessages);
+            chat.newMessages = [];
+
+            return {...state, [id]: chat};
+        }
+        case CLEAR_NEW_MESSAGES: {
+            const { id } = action;
+            const chat = Object.assign({}, state[id]);
+            chat.newMessages = [];
 
             return {...state, [id]: chat};
         }

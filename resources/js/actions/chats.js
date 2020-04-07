@@ -3,6 +3,8 @@ import {
     CLEAR_CHATS,
     TOGGLE_CHAT,
     ADD_MESSAGE_TO_CHAT,
+    MOVE_NEW_MESSAGES_TO_MESSAGES,
+    CLEAR_NEW_MESSAGES,
     FETCHED_CONVERSATION_SUCCESS,
     FETCHED_CONVERSATION_FAILURE,
     FETCHING_CONVERSATION,
@@ -62,10 +64,19 @@ export const addMessageToConversation = (id, message) => ({
     id,
     message
 });
+export const moveNewMessagesToMessages = id => ({
+    type: MOVE_NEW_MESSAGES_TO_MESSAGES,
+    id
+});
+export const clearNewMessages = id => ({
+    type: CLEAR_NEW_MESSAGES,
+    id
+});
 
 export const fetchChatMessages = roomId => {
     return dispatch => {
         dispatch(fetchingConversation(roomId));
+        dispatch(clearNewMessages(roomId));
         chatService.fetchMessages(roomId).then(
             response => {
                 const normalizedMessages = normalize(response.data.messages, [messageSchema]);

@@ -1,10 +1,13 @@
 import React, {Fragment} from 'react';
 import {connect} from 'react-redux';
-import {toggleChat} from '../../actions/chats';
+import {moveNewMessagesToMessages, toggleChat} from '../../actions/chats';
 
 function Friends(props) {
     const handleClick = id => {
         if (id) {
+            if (props.chats[id].messages.length > 0) {
+                props.moveNewMessagesToMessages(id);
+            }
             props.toggleChat(id);
         }
     };
@@ -59,6 +62,7 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = dispatch => ({
     toggleChat: id => dispatch(toggleChat(id)),
+    moveNewMessagesToMessages: id => dispatch(moveNewMessagesToMessages(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends);
