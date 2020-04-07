@@ -6,6 +6,7 @@ import { history } from '../history';
 import { clearServerErrors, setErrors } from './errors';
 import { addUsers } from './users';
 import { setPendingContacts, setFriendsContacts, setRequestsContacts } from './contacts';
+import { setRooms } from './rooms';
 
 import {
     REQUEST_LOGIN,
@@ -20,6 +21,7 @@ import {
     FETCHING_AUTH_USER_SUCCESS,
     FETCHING_AUTH_USER_FAILURE,
 } from '../actionTypes/auth'
+import {initChats} from './chats';
 
 const requestLogin = () => ({
     type: REQUEST_LOGIN
@@ -94,9 +96,11 @@ export const fetchUser = () => {
         userService.getAuthUser().then(response => {
             const normalizedResponse = normalize(response.data.user, userSchemaWithContacts);
             const id = normalizedResponse.result;
-            const { users } = normalizedResponse.entities;
+            const { users, rooms } = normalizedResponse.entities;
             const user = users[id];
             dispatch(addUsers(users));
+            dispatch(setRooms(rooms));
+            dispatch(initChats(Object.keys(rooms)));
             user.hasOwnProperty('requestedFriendsTo') && dispatch(setPendingContacts(user.requestedFriendsTo));
             user.hasOwnProperty('requestFriendsBy') && dispatch(setRequestsContacts(user.requestFriendsBy));
             user.hasOwnProperty('friends') && dispatch(setFriendsContacts(user.friends));
