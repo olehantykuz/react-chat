@@ -12,15 +12,6 @@ import {
     CLEAR_CHATS,
 } from '../actionTypes/chats';
 
-const initialChatState = {
-    fetchingConversation: false,
-    fetchingConversationStatus: null,
-    sendingMessage: false,
-    sendingMessageStatus: null,
-    messages: [],
-    newMessages: [],
-};
-
 const initialState = {
     active: null,
 };
@@ -31,7 +22,14 @@ const chats = (state = initialState, action) => {
             const { ids } = action;
             const initial = {};
             ids.forEach(id => {
-                initial[id] = {...initialChatState}
+                initial[id] = {
+                    fetchingConversation: false,
+                    fetchingConversationStatus: null,
+                    sendingMessage: false,
+                    sendingMessageStatus: null,
+                    messages: [],
+                    newMessages: [],
+                }
             });
 
             return {...state, ...initial};
