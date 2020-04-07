@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, Fragment} from 'react';
 import { connect } from 'react-redux';
 
 import ChatMessages from './ChatMessages';
@@ -66,48 +66,53 @@ function Chat(props) {
     const chatName = selectedRoomId
         ? (props.rooms[selectedRoomId].name || 'Room ' + selectedRoomId)
         : 'No selected Chat';
+    const { pending, requests } = props.contacts;
 
     return (
         <div className="row justify-content-center">
             <div className="col-md-3">
-                <div className="card w-100">
-                    <div className="card-body">
+                <div className="card w-100 app_card">
+                    <div className="card-body app_card--body">
                         <Friends />
                     </div>
                 </div>
-                <div className="card w-100">
-                    <div className="card-body">
-                        <h5>Groups</h5>
-                    </div>
-                </div>
+                {/*<div className="card w-100 app_card">*/}
+                {/*    <div className="card-body app_card--body">*/}
+                {/*        <h5>Groups</h5>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
             </div>
             <div className="col-md-6">
                 <div className="card w-100">
                     <div className="card-body">
                         <div className="panel panel-default">
                             <div className="panel-heading">{chatName}</div>
-
-                            <div className="panel-body">
-                                <ChatMessages />
-                            </div>
-                            <div className="panel-footer">
-                                <ChatMessagesForm />
-                            </div>
+                            {!!props.chats.active && <Fragment>
+                                <div className="panel-body">
+                                    <ChatMessages />
+                                </div>
+                                <div className="panel-footer">
+                                    <ChatMessagesForm />
+                                </div>
+                            </Fragment>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
             <div className="col-md-3">
-                <div className="card w-100">
+                <div className="card w-100 app_card">
                     <div className="card-body">
                         <SearchNewContacts />
                     </div>
                 </div>
-                <div className="card w-100">
-                    <div className="card-body">
-                        <PendingContacts />
+                {(pending.length > 0 || requests.length > 0) &&
+                    <div className="card w-100 app_card">
+                        <div className="card-body app_card--body">
+                            <PendingContacts />
+                        </div>
                     </div>
-                </div>
+                }
             </div>
         </div>
     );
@@ -120,6 +125,7 @@ const mapStateToProps = state => ({
     config: state.config,
     rooms: state.rooms,
     chats: state.chats,
+    contacts: state.contacts,
 });
 const mapDispatchToProps = dispatch => ({
     fetchChatMessages: roomId => dispatch(fetchChatMessages(roomId)),
