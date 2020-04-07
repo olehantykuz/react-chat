@@ -31,6 +31,7 @@ class User extends JsonResource
                 $this->checkIfNeedRelation('friends'),
                 $this->resource->friends
             )),
+            'rooms' => Room::collection($this->whenLoaded('rooms')),
         ];
     }
 
