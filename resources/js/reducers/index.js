@@ -7,6 +7,8 @@ import config from './config';
 import users from './users';
 import messages from './messages';
 import contacts from './contacts';
+import rooms from './rooms';
+import chats from './chats';
 
 export default combineReducers({
     config,
@@ -15,5 +17,7 @@ export default combineReducers({
     chat,
     messages,
     contacts,
+    rooms,
+    chats,
     errors,
 });
