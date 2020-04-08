@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
-use App\Events\FriendConfirm;
-use App\Events\FriendRequest;
+use App\Events\EventFactory;
 use App\Http\Controllers\ApiController;
 use App\Http\Resources\Room as RoomResource;
 use App\Models\User;
@@ -56,16 +55,19 @@ class ContactController extends ApiController
 
     /**
      * @param User $user
+     * @param EventFactory $eventFactory
      * @return JsonResponse
      */
-    public function addToFriend(User $user)
+    public function addToFriend(User $user, EventFactory $eventFactory)
     {
         /** @var User $sender */
         $sender = \Auth::user();
 
         $result = $this->userService->requestToFriend($sender, $user);
         if ($result) {
-            broadcast(new FriendRequest($sender, $user))->toOthers();
+            broadcast(
+                $eventFactory->makeRequestFriendEvent($sender, $user)
+            )->toOthers();
 
             return response()->json(['recipient' => new UserResource($user)], 200);
         }
@@ -75,9 +77,10 @@ class ContactController extends ApiController
 
     /**
      * @param User $user
+     * @param EventFactory $eventFactory
      * @return JsonResponse
      */
-    public function confirmFriend(User $user)
+    public function confirmFriend(User $user, EventFactory $eventFactory)
     {
         /** @var User $sender */
         $sender = \Auth::user();
@@ -86,7 +89,9 @@ class ContactController extends ApiController
         if ($result) {
             $room = $this->roomService->create(collect([$sender->id, $user->id]));
             $this->userService->loadRooms($user);
-            broadcast(new FriendConfirm($sender, $user, $room))->toOthers();
+            broadcast(
+                $eventFactory->makeConfirmFriendEvent($sender, $user, $room)
+            )->toOthers();
 
             return response()->json([
                 'recipient' => new UserResource($user),

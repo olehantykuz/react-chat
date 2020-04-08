@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Events\EventFactory;
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\CreateMessage;
 use App\Models\Room;
@@ -9,7 +10,6 @@ use App\Models\User;
 use App\Services\MessageService;
 use App\Services\RoomService;
 use Illuminate\Http\Request;
-use App\Events\MessageSent;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\Message as MessageResource;
 
@@ -47,9 +47,10 @@ class RoomsController extends ApiController
     /**
      * @param Room $room
      * @param Request $request
+     * @param EventFactory $eventFactory
      * @return JsonResponse
      */
-    public function sendMessage(Room $room, Request $request)
+    public function sendMessage(Room $room, Request $request, EventFactory $eventFactory)
     {
         $validator = \Validator::make($request->all(), with(new CreateMessage())->rules());
         if ($validator->fails()) {
@@ -59,7 +60,9 @@ class RoomsController extends ApiController
         /** @var User $user */
         $user = \Auth::user();
         $message = $this->messageService->create($user, $room, $request->input('text'));
-        broadcast(new MessageSent($message, $room))->toOthers();
+        broadcast(
+            $eventFactory->makeSentMessageEvent($message, $room)
+        )->toOthers();
 
         return response()->json(['message' => $message]);
     }
