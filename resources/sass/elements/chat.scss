@@ -74,17 +74,13 @@
     }
 
     &-body {
-        height: 350px;
         border: 1px solid grey;
         padding: 5px;
         border-bottom-left-radius: 10px;
         border-top-left-radius: 10px;
 
-        ul {
-            overflow-y: scroll;
-            display: flex;
-            flex-direction: column-reverse;
-            height: 100%;
+        .stb {
+            height: 350px;
         }
     }
 
@@ -100,23 +96,4 @@
             height: 100%;
         }
     }
-}
-
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    background-color: #F5F5F5;
-    overflow: hidden;
-    padding-top: 10px;
-}
-
-::-webkit-scrollbar {
-    width: 12px;
-    background-color: #F5F5F5;
-    overflow: hidden;
-    padding-top: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #555;
 }

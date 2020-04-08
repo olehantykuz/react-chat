@@ -21,7 +21,7 @@ function ChatMessages (props) {
                         authId={props.auth.id}
                     />
                 );
-            }).reverse()}
+            })}
         </ul>
     );
 }

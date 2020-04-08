@@ -1,5 +1,6 @@
 import React, {useEffect, Fragment} from 'react';
 import { connect } from 'react-redux';
+import ScrollToBottom from 'react-scroll-to-bottom';
 
 import ChatMessages from './ChatMessages';
 import ChatMessagesForm from './ChatMessagesForm';
@@ -108,7 +109,9 @@ function Chat(props) {
                             <div className="panel-heading">{getChatName()}</div>
                             {!!props.chats.active && <Fragment>
                                 <div className="panel-body">
-                                    <ChatMessages />
+                                    <ScrollToBottom className={'stb'}>
+                                        <ChatMessages />
+                                    </ScrollToBottom>
                                 </div>
                                 <div className="panel-footer">
                                     <ChatMessagesForm />
