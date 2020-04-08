@@ -96,7 +96,8 @@ export const fetchUser = () => {
         userService.getAuthUser().then(response => {
             const normalizedResponse = normalize(response.data.user, userSchemaWithContacts);
             const id = normalizedResponse.result;
-            const { users, rooms } = normalizedResponse.entities;
+            const { users } = normalizedResponse.entities;
+            const rooms = normalizedResponse.entities.rooms || {};
             const user = users[id];
             dispatch(addUsers(users));
             dispatch(setRooms(rooms));
