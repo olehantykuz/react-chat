@@ -4,9 +4,12 @@ import { connect } from 'react-redux';
 import ChatMessagesItem from './ChatMessagesItem';
 
 function ChatMessages (props) {
+    const { active } = props.chats;
+    const ids = active ? props.chats[active].messages : [];
+
     return (
         <ul className="chat">
-            {props.chat.messages.map(id => {
+            {ids.map(id => {
                 const message = props.messages[id];
                 const user = props.users[message.user];
 
@@ -15,6 +18,7 @@ function ChatMessages (props) {
                         message={message}
                         user={user}
                         key={id}
+                        authId={props.auth.id}
                     />
                 );
             })}
@@ -23,9 +27,10 @@ function ChatMessages (props) {
 }
 
 const mapStateToProps = state => ({
-    chat: state.chat,
     users: state.users,
-    messages: state.messages
+    messages: state.messages,
+    chats: state.chats,
+    auth: state.auth,
 });
 
 export default connect(mapStateToProps)(ChatMessages);

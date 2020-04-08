@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\App;
 
-use App\Events\FriendConfirm;
-use App\Events\FriendRequest;
+use App\Events\EventFactory;
 use App\Http\Controllers\ApiController;
+use App\Http\Resources\Room as RoomResource;
 use App\Models\User;
+use App\Services\RoomService;
 use App\Services\UserService;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\User as UserResource;
 
@@ -17,6 +17,8 @@ class ContactController extends ApiController
 {
     /** @var UserService  */
     protected $userService;
+    /** @var RoomService  */
+    protected $roomService;
 
     /**
      * ContactController constructor.
@@ -24,6 +26,7 @@ class ContactController extends ApiController
     public function __construct()
     {
         $this->userService = new UserService();
+        $this->roomService = new RoomService();
         parent::__construct();
     }
 
@@ -33,8 +36,8 @@ class ContactController extends ApiController
      */
     public function searchNewContacts(Request $request)
     {
-        /** @var \Illuminate\Contracts\Validation\Validator $validator */
-        $validator = Validator::make($request->all(), [
+        /** @var Validator $validator */
+        $validator = \Validator::make($request->all(), [
             'query' => 'nullable|string'
         ]);
         if ($validator->fails()) {
@@ -44,7 +47,7 @@ class ContactController extends ApiController
 
         $query = $request->get('query', '');
         /** @var User $authUser */
-        $authUser = Auth::user();
+        $authUser = \Auth::user();
         $users = $this->userService->findNewContacts($query, $authUser);
 
         return UserResource::collection($users);
@@ -52,16 +55,19 @@ class ContactController extends ApiController
 
     /**
      * @param User $user
+     * @param EventFactory $eventFactory
      * @return JsonResponse
      */
-    public function addToFriend(User $user)
+    public function addToFriend(User $user, EventFactory $eventFactory)
     {
         /** @var User $sender */
-        $sender = Auth::user();
+        $sender = \Auth::user();
 
         $result = $this->userService->requestToFriend($sender, $user);
         if ($result) {
-            broadcast(new FriendRequest($sender, $user))->toOthers();
+            broadcast(
+                $eventFactory->makeRequestFriendEvent($sender, $user)
+            )->toOthers();
 
             return response()->json(['recipient' => new UserResource($user)], 200);
         }
@@ -71,18 +77,27 @@ class ContactController extends ApiController
 
     /**
      * @param User $user
+     * @param EventFactory $eventFactory
      * @return JsonResponse
      */
-    public function confirmFriend(User $user)
+    public function confirmFriend(User $user, EventFactory $eventFactory)
     {
         /** @var User $sender */
-        $sender = Auth::user();
+        $sender = \Auth::user();
         $result = $this->userService->confirmFriendsInvite($sender, $user);
 
         if ($result) {
-            broadcast(new FriendConfirm($sender, $user))->toOthers();
+            $room = $this->roomService->create(collect([$sender->id, $user->id]));
+            $this->userService->loadRooms($user);
+            broadcast(
+                $eventFactory->makeConfirmFriendEvent($sender, $user, $room)
+            )->toOthers();
 
-            return response()->json(['recipient' => new UserResource($user)], 200);
+            return response()->json([
+                'recipient' => new UserResource($user),
+                'room' => new RoomResource($room),
+                'roomId' => $room->id,
+            ], 200);
         }
 
         return response()->json(['error' => 'Friend request not found'], 404);

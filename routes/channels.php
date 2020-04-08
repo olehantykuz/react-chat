@@ -14,16 +14,18 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('chat', function ($user) {
-    return Auth::check();
-});
-
 Broadcast::channel('request.friend.to.{userId}', function ($user, $userId) {
     return (int) $user->id === (int) $userId;
 });
 
 Broadcast::channel('confirm.friend.to.{userId}', function ($user, $userId) {
     return (int) $user->id === (int) $userId;
+});
+
+Broadcast::channel('message.to.room.{userId}', function ($user, $roomId) {
+    $roomsIds = $user->rooms->pluck('id');
+
+    return $roomsIds->contains($roomId);
 });
 
 Broadcast::channel('App.User.{id}', function ($user, $id) {

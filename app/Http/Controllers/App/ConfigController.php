@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class ConfigController extends Controller
 {
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function __invoke()
     {
         $config = [

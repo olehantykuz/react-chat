@@ -1,19 +1,19 @@
 import axios from 'axios';
 import { authHeader } from "../helpers";
 
-const baseUrl = '/api/chat';
+const baseUrl = '/api/rooms';
 
-const fetchMessages = () => {
+const fetchMessages = roomId => {
     return axios({
-        url: `${baseUrl}/messages`,
+        url: `${baseUrl}/${roomId}/conversation`,
         method: 'get',
         headers: authHeader(),
     }).then(response => response);
 };
 
-const sendMessage = (text) => {
+const sendMessage = (text, roomId) => {
     return axios({
-        url: `${baseUrl}/messages`,
+        url: `${baseUrl}/${roomId}/conversation`,
         method: 'post',
         data: {text},
         headers: authHeader(),

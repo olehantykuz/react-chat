@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Models\Room;
 use App\Models\User;
 use App\Models\Message;
 
@@ -10,17 +11,18 @@ class MessageService
 {
     /**
      * @param User $user
+     * @param Room $room
      * @param string $text
      *
      * @return Message
      */
-    public function create(User $user, string $text)
+    public function create(User $user, Room $room, string $text)
     {
-        /** @var Message $message */
-        $message = $user->messages()->create([
-            'text' => $text
-        ]);
-        $message->load('user');
+        $message = new Message;
+        $message->text = $text;
+        $message->user()->associate($user);
+        $message->room()->associate($room);
+        $message->save();
 
         return $message;
     }

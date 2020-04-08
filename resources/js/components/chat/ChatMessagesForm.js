@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { connect } from 'react-redux';
-import { sendMessage } from '../../actions/chat';
 import { isLoggedIn } from '../../helpers';
+import { sendMessage } from '../../actions/chats';
 
 function ChatMessagesForm(props) {
     const [message, setMessage] = useState('');
@@ -12,7 +12,7 @@ function ChatMessagesForm(props) {
 
     const sendMessage = () => {
         if (message.trim()) {
-            props.sendMessage(message);
+            props.sendMessage(message, props.chats.active);
             setMessage('');
         }
     };
@@ -56,10 +56,10 @@ function ChatMessagesForm(props) {
 }
 
 const mapStateToProps = state => ({
-    chat: state.chat,
+    chats: state.chats,
 });
 const mapDispatchToProps = dispatch => ({
-    sendMessage: payload => dispatch(sendMessage(payload)),
+    sendMessage: (text, roomId) => dispatch(sendMessage(text, roomId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatMessagesForm);

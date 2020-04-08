@@ -1,116 +1,159 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, Fragment} from 'react';
 import { connect } from 'react-redux';
+import ScrollToBottom from 'react-scroll-to-bottom';
 
 import ChatMessages from './ChatMessages';
 import ChatMessagesForm from './ChatMessagesForm';
 import SearchNewContacts from './SearchNewContacts';
 import PendingContacts from './PendingContacts';
 import Friends from './Friends';
-import { isLoggedIn } from '../../helpers';
-import { addNewChatMessage, fetchMessages } from '../../actions/chat';
 import { addFriendRequest, addToFriendsFromRequested } from '../../actions/contacts';
+import { fetchChatMessages, addMessageToRoom } from '../../actions/chats';
 
 function Chat(props) {
+    useEffect(() => {
+        const {active: roomId} = props.chats;
+
+        if (roomId && props.chats[roomId].messages.length === 0) {
+            props.fetchChatMessages(roomId);
+        }
+    }, [props.chats.active]);
+
     useEffect(() => {
         const { broadcastChannelPrefix } = props.config;
         const hasConfigs = broadcastChannelPrefix !== undefined;
         let chatChannelName = '';
         let addFriendChannelName = '';
         let confirmedFriendChannelName = '';
+        const roomsChannelsNames = [];
 
         if (hasConfigs && props.auth.id) {
             chatChannelName = broadcastChannelPrefix + 'private-chat';
             addFriendChannelName = broadcastChannelPrefix + 'private-request.friend.to.' + props.auth.id;
             confirmedFriendChannelName =broadcastChannelPrefix + 'private-confirm.friend.to.' + props.auth.id;
 
-            Echo.channel(chatChannelName)
-                .listen('.message.send', e => {
-                    const { message } = e;
-
-                    //TODO: Fix self listening for redis driver
-                    if (message.user.id !== props.auth.id) {
-                        props.addNewChatMessage(message);
-                    }
-                });
             Echo.channel(addFriendChannelName)
                 .listen('.request.friend', e => {
                     props.addFriendRequest(e.sender);
                 });
             Echo.channel(confirmedFriendChannelName)
                 .listen('.confirm.friend', e => {
-                    props.addToFriendsFromRequested(e.sender);
+                    props.addToFriendsFromRequested(e.sender, e.room);
                 });
-        }
 
-        if (isLoggedIn() && props.chat.messages.length === 0 && !props.chat.fetchingMessage) {
-            props.fetchMessages();
+            Object.keys(props.rooms).forEach(room => {
+                const cnName = broadcastChannelPrefix + 'private-message.to.room.' + room;
+                roomsChannelsNames.push(cnName);
+
+                Echo.channel(cnName)
+                    .listen('.message.send', e => {
+                        const { message, room} = e;
+                        if (message.user_id !== props.auth.id) {
+                            props.addMessageToRoom(message, room.id);
+                        }
+                    });
+            });
         }
 
         return () => {
             chatChannelName && Echo.leave(chatChannelName);
             addFriendChannelName && Echo.leave(addFriendChannelName);
+            roomsChannelsNames.forEach(name => {
+                Echo.leave(name);
+            });
         }
 
-    }, [props.config, props.auth.id]);
+    }, [props.config, props.auth.id, props.rooms]);
+
+    const getChatName = () => {
+        const selectedRoomId = props.chats.active;
+
+        if (selectedRoomId) {
+            const room = props.rooms[selectedRoomId];
+            let chatName = room.name;
+
+            if (!chatName) {
+                const { authUserId } = props.auth;
+                const userId = room.users.find(id => {
+                    return id !== authUserId;
+                });
+                chatName = `Chat with ${props.users[userId].name}`
+            }
+
+            return chatName;
+        }
+
+        return 'No selected Chat';
+    };
+
+    const { pending, requests } = props.contacts;
 
     return (
         <div className="row justify-content-center">
             <div className="col-md-3">
-                <div className="card w-100">
-                    <div className="card-body">
+                <div className="card w-100 app_card">
+                    <div className="card-body app_card--body">
                         <Friends />
                     </div>
                 </div>
-                <div className="card w-100">
-                    <div className="card-body">
-                        <h5>Groups</h5>
-                    </div>
-                </div>
+                {/*<div className="card w-100 app_card">*/}
+                {/*    <div className="card-body app_card--body">*/}
+                {/*        <h5>Groups</h5>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
             </div>
             <div className="col-md-6">
                 <div className="card w-100">
                     <div className="card-body">
                         <div className="panel panel-default">
-                            <div className="panel-heading">Chats</div>
-
-                            <div className="panel-body">
-                                <ChatMessages />
-                            </div>
-                            <div className="panel-footer">
-                                <ChatMessagesForm />
-                            </div>
+                            <div className="panel-heading">{getChatName()}</div>
+                            {!!props.chats.active && <Fragment>
+                                <div className="panel-body">
+                                    <ScrollToBottom className={'stb'}>
+                                        <ChatMessages />
+                                    </ScrollToBottom>
+                                </div>
+                                <div className="panel-footer">
+                                    <ChatMessagesForm />
+                                </div>
+                            </Fragment>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
             <div className="col-md-3">
-                <div className="card w-100">
+                <div className="card w-100 app_card">
                     <div className="card-body">
                         <SearchNewContacts />
                     </div>
                 </div>
-                <div className="card w-100">
-                    <div className="card-body">
-                        <PendingContacts />
+                {(pending.length > 0 || requests.length > 0) &&
+                    <div className="card w-100 app_card">
+                        <div className="card-body app_card--body">
+                            <PendingContacts />
+                        </div>
                     </div>
-                </div>
+                }
             </div>
         </div>
     );
 }
 
 const mapStateToProps = state => ({
-    chat: state.chat,
     users: state.users,
     messages: state.messages,
     auth: state.auth,
     config: state.config,
+    rooms: state.rooms,
+    chats: state.chats,
+    contacts: state.contacts,
 });
 const mapDispatchToProps = dispatch => ({
-    fetchMessages: () => dispatch(fetchMessages()),
-    addNewChatMessage: payload => dispatch(addNewChatMessage(payload)),
+    fetchChatMessages: roomId => dispatch(fetchChatMessages(roomId)),
+    addMessageToRoom: (payload, roomId) => dispatch(addMessageToRoom(payload, roomId)),
     addFriendRequest: payload => dispatch(addFriendRequest(payload)),
-    addToFriendsFromRequested: payload => dispatch(addToFriendsFromRequested(payload)),
+    addToFriendsFromRequested: (user, room) => dispatch(addToFriendsFromRequested(user, room)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Chat);
