@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -17,20 +18,20 @@ class FriendConfirm implements ShouldBroadcast
 
     public $sender;
     public $recipient;
-    public $roomId;
+    public $room;
 
     /**
      * Create a new event instance.
      *
      * @param User $sender
      * @param User $recipient
-     * @param int $roomId
+     * @param Room $room
      */
-    public function __construct(User $sender, User $recipient, int $roomId)
+    public function __construct(User $sender, User $recipient, Room $room)
     {
         $this->sender = $sender->withoutRelations();
         $this->recipient = $recipient;
-        $this->roomId = $roomId;
+        $this->room = $room;
     }
 
     /**

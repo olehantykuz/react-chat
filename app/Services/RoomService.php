@@ -17,6 +17,7 @@ class RoomService
     {
         $room = Room::create(['name' => $name]);
         $room->users()->attach($participantsIds);
+        $room->load('users');
 
         return $room;
     }

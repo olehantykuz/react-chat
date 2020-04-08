@@ -5,6 +5,7 @@ namespace App\Http\Controllers\App;
 use App\Events\FriendConfirm;
 use App\Events\FriendRequest;
 use App\Http\Controllers\ApiController;
+use App\Http\Resources\Room as RoomResource;
 use App\Models\User;
 use App\Services\RoomService;
 use App\Services\UserService;
@@ -84,10 +85,12 @@ class ContactController extends ApiController
 
         if ($result) {
             $room = $this->roomService->create(collect([$sender->id, $user->id]));
-            broadcast(new FriendConfirm($sender, $user, $room->id))->toOthers();
+            $this->userService->loadRooms($user);
+            broadcast(new FriendConfirm($sender, $user, $room))->toOthers();
 
             return response()->json([
                 'recipient' => new UserResource($user),
+                'room' => new RoomResource($room),
                 'roomId' => $room->id,
             ], 200);
         }
