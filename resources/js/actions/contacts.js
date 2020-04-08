@@ -1,7 +1,8 @@
 import { normalize } from 'normalizr';
-import { userSchema } from '../schemas';
+import { userSchema, userSchemaWithContacts } from '../schemas';
 
 import { contactsService } from '../services/contacts';
+import { addChatRoom } from './chats';
 import { setUser } from './users';
 
 import {
@@ -122,8 +123,9 @@ export const confirmFriendRequest = id => {
         dispatch(clearServerErrors('confirmContact'));
         contactsService.confirmToFriend(id).then(
             response => {
-                const normalizedUser = normalize(response.data.recipient, userSchema);
+                const normalizedUser = normalize(response.data.recipient, userSchemaWithContacts);
                 const id = normalizedUser.result;
+                dispatch(addChatRoom(response.data.room));
                 dispatch(addContactToFriends(id));
                 dispatch(removeContactFromRequests(id));
                 dispatch(confirmingNewFriendSuccess());
@@ -136,12 +138,13 @@ export const confirmFriendRequest = id => {
     }
 };
 
-export const addToFriendsFromRequested = sender => {
+export const addToFriendsFromRequested = (sender, room) => {
     return dispatch => {
         const normalizedUser = normalize(sender, userSchema);
         const id = normalizedUser.result;
         const user = normalizedUser.entities.users[id];
         dispatch(setUser(id, user));
+        dispatch(addChatRoom(room));
         dispatch(addContactToFriends(id));
         dispatch(removeContactFromPending(id));
     }

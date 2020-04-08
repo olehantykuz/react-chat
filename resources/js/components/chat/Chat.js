@@ -38,7 +38,7 @@ function Chat(props) {
                 });
             Echo.channel(confirmedFriendChannelName)
                 .listen('.confirm.friend', e => {
-                    props.addToFriendsFromRequested(e.sender);
+                    props.addToFriendsFromRequested(e.sender, e.room);
                 });
 
             Object.keys(props.rooms).forEach(room => {
@@ -153,7 +153,7 @@ const mapDispatchToProps = dispatch => ({
     fetchChatMessages: roomId => dispatch(fetchChatMessages(roomId)),
     addMessageToRoom: (payload, roomId) => dispatch(addMessageToRoom(payload, roomId)),
     addFriendRequest: payload => dispatch(addFriendRequest(payload)),
-    addToFriendsFromRequested: payload => dispatch(addToFriendsFromRequested(payload)),
+    addToFriendsFromRequested: (user, room) => dispatch(addToFriendsFromRequested(user, room)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Chat);
