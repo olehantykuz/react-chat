@@ -1,5 +1,6 @@
 import {
     DEFAULT_INIT_CHATS,
+    ADD_CHAT,
     CLEAR_CHATS,
     TOGGLE_CHAT,
     ADD_MESSAGE_TO_CHAT,
@@ -15,13 +16,18 @@ import {
 } from '../actionTypes/chats';
 import {chatService} from '../services/chat';
 import {normalize} from 'normalizr';
-import {messageSchema} from '../schemas';
+import {messageSchema, roomSchema} from '../schemas';
 import {addUsers} from './users';
 import {addMessages} from './messages';
+import {addRoom} from './rooms';
 
 export const initChats = ids => ({
     type: DEFAULT_INIT_CHATS,
     ids
+});
+export const addChat = id => ({
+    type: ADD_CHAT,
+    id
 });
 export const clearChats = () => ({
     type: CLEAR_CHATS,
@@ -72,6 +78,15 @@ export const clearNewMessages = id => ({
     type: CLEAR_NEW_MESSAGES,
     id
 });
+
+export const addChatRoom = room => {
+    return dispatch => {
+        const normalizedRoom = normalize(room, roomSchema);
+        const roomId = normalizedRoom.result;
+        dispatch(addRoom(roomId, normalizedRoom.entities.rooms[roomId]));
+        dispatch(addChat(roomId));
+    }
+};
 
 export const fetchChatMessages = roomId => {
     return dispatch => {

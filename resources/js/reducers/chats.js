@@ -1,5 +1,6 @@
 import {
     DEFAULT_INIT_CHATS,
+    ADD_CHAT,
     FETCHING_CONVERSATION,
     FETCHED_CONVERSATION_SUCCESS,
     FETCHED_CONVERSATION_FAILURE,
@@ -35,6 +36,21 @@ const chats = (state = initialState, action) => {
             });
 
             return {...state, ...initial};
+        }
+        case ADD_CHAT: {
+            const { id } = action;
+            const chat = {
+                [id]: {
+                    fetchingConversation: false,
+                    fetchingConversationStatus: null,
+                    sendingMessage: false,
+                    sendingMessageStatus: null,
+                    messages: [],
+                    newMessages: [],
+                }
+            }
+
+            return {...state, ...chat};
         }
         case FETCHING_CONVERSATION: {
             const {id} = action;
