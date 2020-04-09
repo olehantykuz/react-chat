@@ -2,14 +2,13 @@
 
 use Illuminate\Support\Str;
 
-$databaseUrl = \getenv('JAWSDB_URL')
-    ?? \getenv('DATABASE_URL');
-
 $mysqlHost = env('DB_HOST', '127.0.0.1');
 $mysqlDbName = env('DB_DATABASE', 'forge');
 $mysqlUser = env('DB_USERNAME', 'forge');
 $mysqlPassword = env('DB_PASSWORD', '');
 
+$databaseUrl = \getenv('JAWSDB_URL')
+    ?? \getenv('DATABASE_URL');
 if ($databaseUrl) {
     $db = \parse_url($databaseUrl);
     $mysqlHost = $db['host'];
