@@ -5,21 +5,17 @@ use Illuminate\Support\Str;
 $databaseUrl = \getenv('CLEARDB_DATABASE_URL')
     ?? \getenv('DATABASE_URL');
 
+$mysqlHost = env('DB_HOST', '127.0.0.1');
+$mysqlDbName = env('DB_DATABASE', 'forge');
+$mysqlUser = env('DB_USERNAME', 'forge');
+$mysqlPassword = env('DB_PASSWORD', '');
+
 if ($databaseUrl) {
     $db = \parse_url($databaseUrl);
-    \putenv('DB_HOST=' . $db['host']);
-    \putenv('DB_DATABASE=' . \substr($db['path'], 1));
-    \putenv('DB_USERNAME=' . $db['user']);
-    \putenv('DB_PASSWORD=' . $db['pass']);
-}
-
-$redisUrl = \getenv('REDIS_URL');
-
-if($redisUrl) {
-    $redis = \parse_url($redisUrl);
-    \putenv('REDIS_HOST=' . $redis['host']);
-    \putenv('REDIS_PORT=' . $redis['port']);
-    \putenv('REDIS_PASSWORD=' . $redis['pass']);
+    $mysqlHost = $db['host'];
+    $mysqlDbName = \substr($db['path'], 1);
+    $mysqlUser = $db['user'];
+    $mysqlPassword = $db['pass'];
 }
 
 return [
@@ -66,11 +62,11 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => $mysqlHost,
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'database' => $mysqlDbName,
+            'username' => $mysqlUser,
+            'password' => $mysqlPassword,
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
