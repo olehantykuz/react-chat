@@ -2,6 +2,26 @@
 
 use Illuminate\Support\Str;
 
+$databaseUrl = \getenv('CLEARDB_DATABASE_URL')
+    ?? \getenv('DATABASE_URL');
+
+if ($databaseUrl) {
+    $db = \parse_url($databaseUrl);
+    \putenv('DB_HOST=' . $db['host']);
+    \putenv('DB_DATABASE=' . \substr($db['path'], 1));
+    \putenv('DB_USERNAME=' . $db['user']);
+    \putenv('DB_PASSWORD=' . $db['pass']);
+}
+
+$redisUrl = \getenv('REDIS_URL');
+
+if($redisUrl) {
+    $redis = \parse_url($redisUrl);
+    \putenv('REDIS_HOST=' . $redis['host']);
+    \putenv('REDIS_PORT=' . $redis['port']);
+    \putenv('REDIS_PASSWORD=' . $redis['pass']);
+}
+
 return [
 
     /*
