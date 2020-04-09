@@ -54,6 +54,7 @@ function Chat(props) {
                     });
             });
         }
+        console.log(Echo);
 
         return () => {
             chatChannelName && Echo.leave(chatChannelName);
