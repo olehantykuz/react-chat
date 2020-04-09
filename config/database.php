@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Str;
 
-$databaseUrl = \getenv('CLEARDB_DATABASE_URL')
+$databaseUrl = \getenv('JAWSDB_URL')
     ?? \getenv('DATABASE_URL');
 
 $mysqlHost = env('DB_HOST', '127.0.0.1');
