@@ -48,7 +48,7 @@ const chats = (state = initialState, action) => {
                     messages: [],
                     newMessages: [],
                 }
-            }
+            };
 
             return {...state, ...chat};
         }
