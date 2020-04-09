@@ -15,11 +15,11 @@ use Illuminate\Support\Facades\Broadcast;
 */
 
 Broadcast::channel('request.friend.to.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
+    return \Auth::check();
 });
 
 Broadcast::channel('confirm.friend.to.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
+    return \Auth::check();
 });
 
 Broadcast::channel('message.to.room.{userId}', function ($user, $roomId) {
