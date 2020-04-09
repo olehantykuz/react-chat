@@ -68,6 +68,7 @@ export const login = data => {
             dispatch(loggedIn());
             dispatch(fetchUser());
             dispatch(clearLoginStatus());
+            window.Echo.options.auth.headers.Authorization = 'Bearer ' + JSON.parse(window.localStorage.getItem('authToken'));
             history.push('/');
         }, error => {
             dispatch(loginFailure());
