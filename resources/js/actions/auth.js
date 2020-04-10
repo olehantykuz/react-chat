@@ -65,10 +65,13 @@ export const login = data => {
         dispatch(clearServerErrors('login'));
         dispatch(requestLogin());
         userService.login(data).then(response => {
+            const broadcastDriver = JSON.parse(localStorage.getItem('broadcastDriver'));
+            if (broadcastDriver === 'pusher') {
+                Echo.connector.pusher.config.auth.headers.Authorization = 'Bearer ' + JSON.parse(localStorage.getItem('authToken'));
+            }
             dispatch(loggedIn());
             dispatch(fetchUser());
             dispatch(clearLoginStatus());
-            window.Echo.options.auth.headers.Authorization = 'Bearer ' + JSON.parse(window.localStorage.getItem('authToken'));
             history.push('/');
         }, error => {
             dispatch(loginFailure());
