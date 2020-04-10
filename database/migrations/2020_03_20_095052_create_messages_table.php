@@ -19,7 +19,7 @@ class CreateMessagesTable extends Migration
             $table->text('text');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
         });
     }
 
