@@ -145,7 +145,7 @@ export const addToFriendsFromRequested = (sender, room) => {
         const user = normalizedUser.entities.users[id];
         dispatch(setUser(id, user));
         dispatch(addChatRoom(room));
-        dispatch(addContactToFriends(id));
         dispatch(removeContactFromPending(id));
+        dispatch(addContactToFriends(id));
     }
 };
