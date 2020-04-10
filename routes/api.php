@@ -19,7 +19,7 @@ Route::group(['namespace' => 'App'], function () {
     });
     Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
         Route::post('register', 'AuthController@register');
-        Route::post('login', 'AuthController@login');
+        Route::post('login', 'AuthController@login')->name('login');
         Route::post('logout', 'AuthController@logout');
         Route::post('refresh', 'AuthController@refresh');
         Route::get('me', 'AuthController@me');

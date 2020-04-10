@@ -11,6 +11,9 @@ import { addFriendRequest, addToFriendsFromRequested } from '../../actions/conta
 import { fetchChatMessages, addMessageToRoom } from '../../actions/chats';
 
 function Chat(props) {
+    const { broadcastChannelPrefix } = props.config;
+    const hasConfigs = broadcastChannelPrefix !== undefined;
+
     useEffect(() => {
         const {active: roomId} = props.chats;
 
@@ -20,15 +23,10 @@ function Chat(props) {
     }, [props.chats.active]);
 
     useEffect(() => {
-        const { broadcastChannelPrefix } = props.config;
-        const hasConfigs = broadcastChannelPrefix !== undefined;
-        let chatChannelName = '';
         let addFriendChannelName = '';
         let confirmedFriendChannelName = '';
-        const roomsChannelsNames = [];
 
         if (hasConfigs && props.auth.id) {
-            chatChannelName = broadcastChannelPrefix + 'private-chat';
             addFriendChannelName = broadcastChannelPrefix + 'private-request.friend.to.' + props.auth.id;
             confirmedFriendChannelName =broadcastChannelPrefix + 'private-confirm.friend.to.' + props.auth.id;
 
@@ -40,7 +38,18 @@ function Chat(props) {
                 .listen('.confirm.friend', e => {
                     props.addToFriendsFromRequested(e.sender, e.room);
                 });
+        }
 
+        return () => {
+            confirmedFriendChannelName && Echo.leave(confirmedFriendChannelName);
+            addFriendChannelName && Echo.leave(addFriendChannelName);
+        }
+
+    }, [props.config, props.auth.id]);
+
+    useEffect(() => {
+        const roomsChannelsNames = [];
+        if (hasConfigs && props.auth.id) {
             Object.keys(props.rooms).forEach(room => {
                 const cnName = broadcastChannelPrefix + 'private-message.to.room.' + room;
                 roomsChannelsNames.push(cnName);
@@ -56,14 +65,11 @@ function Chat(props) {
         }
 
         return () => {
-            chatChannelName && Echo.leave(chatChannelName);
-            addFriendChannelName && Echo.leave(addFriendChannelName);
             roomsChannelsNames.forEach(name => {
                 Echo.leave(name);
             });
         }
-
-    }, [props.config, props.auth.id, props.rooms]);
+    }, [props.rooms, props.auth.id]);
 
     const getChatName = () => {
         const selectedRoomId = props.chats.active;

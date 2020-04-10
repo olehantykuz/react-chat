@@ -7,6 +7,7 @@ import { clearServerErrors, setErrors } from './errors';
 import { addUsers } from './users';
 import { setPendingContacts, setFriendsContacts, setRequestsContacts } from './contacts';
 import { setRooms } from './rooms';
+import { authEchoChannels } from '../helpers';
 
 import {
     REQUEST_LOGIN,
@@ -65,6 +66,8 @@ export const login = data => {
         dispatch(clearServerErrors('login'));
         dispatch(requestLogin());
         userService.login(data).then(response => {
+            const broadcastDriver = JSON.parse(localStorage.getItem('broadcastDriver'));
+            authEchoChannels(broadcastDriver);
             dispatch(loggedIn());
             dispatch(fetchUser());
             dispatch(clearLoginStatus());

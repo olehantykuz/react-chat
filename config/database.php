@@ -2,6 +2,21 @@
 
 use Illuminate\Support\Str;
 
+$mysqlHost = env('DB_HOST', '127.0.0.1');
+$mysqlDbName = env('DB_DATABASE', 'forge');
+$mysqlUser = env('DB_USERNAME', 'forge');
+$mysqlPassword = env('DB_PASSWORD', '');
+
+$databaseUrl = \getenv('JAWSDB_URL')
+    ?? \getenv('DATABASE_URL');
+if ($databaseUrl) {
+    $db = \parse_url($databaseUrl);
+    $mysqlHost = $db['host'];
+    $mysqlDbName = \substr($db['path'], 1);
+    $mysqlUser = $db['user'];
+    $mysqlPassword = $db['pass'];
+}
+
 return [
 
     /*
@@ -46,11 +61,11 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => $mysqlHost,
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'database' => $mysqlDbName,
+            'username' => $mysqlUser,
+            'password' => $mysqlPassword,
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
