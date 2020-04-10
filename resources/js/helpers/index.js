@@ -1,7 +1,29 @@
-const authHeader = () => {
-    const token = JSON.parse(window.localStorage.getItem('authToken'));
+const getAuthHeader = () => {
+    const token = JSON.parse(localStorage.getItem('authToken'))
 
-    return token ? { Authorization: 'Bearer ' + JSON.parse(window.localStorage.getItem('authToken')) } : {};
+    return token
+        ? 'Bearer ' + token
+        : null;
+};
+
+const authHeader = () => {
+    const authHeader = getAuthHeader();
+
+    return authHeader ? { Authorization: authHeader } : {};
+};
+
+const authEchoChannels = driver => {
+    const authHeader = getAuthHeader();
+
+    switch (driver) {
+        case 'pusher': {
+            Echo.connector.pusher.config.auth.headers.Authorization = authHeader;
+            break;
+        }
+        default: {
+            Echo.options.auth.headers.Authorization = authHeader;
+        }
+    }
 };
 
 const isLoggedIn = () => {
@@ -49,4 +71,4 @@ const processServerErrors = data => {
     return result;
 };
 
-export { authHeader, isLoggedIn, isObject, isArray, hasError, processServerErrors };
+export { authHeader, authEchoChannels, isLoggedIn, isObject, isArray, hasError, processServerErrors };

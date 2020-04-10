@@ -7,6 +7,7 @@ import { clearServerErrors, setErrors } from './errors';
 import { addUsers } from './users';
 import { setPendingContacts, setFriendsContacts, setRequestsContacts } from './contacts';
 import { setRooms } from './rooms';
+import { authEchoChannels } from '../helpers';
 
 import {
     REQUEST_LOGIN,
@@ -66,9 +67,7 @@ export const login = data => {
         dispatch(requestLogin());
         userService.login(data).then(response => {
             const broadcastDriver = JSON.parse(localStorage.getItem('broadcastDriver'));
-            if (broadcastDriver === 'pusher') {
-                Echo.connector.pusher.config.auth.headers.Authorization = 'Bearer ' + JSON.parse(localStorage.getItem('authToken'));
-            }
+            authEchoChannels(broadcastDriver);
             dispatch(loggedIn());
             dispatch(fetchUser());
             dispatch(clearLoginStatus());
